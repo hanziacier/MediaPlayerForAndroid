@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">听音乐</string>
+    <string name="app_name">听音乐</string>
+	<string name="nosongs">没有音乐播放</string>
+	<string name="default_song">依然爱你</string>
+	<string name="default_star">王力宏</string>
+</resources>
