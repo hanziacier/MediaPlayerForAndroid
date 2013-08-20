@@ -163,12 +163,12 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		this.registerReceiver(completionListner, filter);
 	}
 	private class MobliePhoneStateListener extends PhoneStateListener {
-
+		Intent intent;
 		@Override
 		public void onCallStateChanged(int state, String incomingNumber) {
 			switch (state) {
 			case TelephonyManager.CALL_STATE_IDLE: /* 无任何状态时 */
-				Intent intent = new Intent(MusicActivity.this,
+				intent = new Intent(MusicActivity.this,
 						MusicService.class);
 				intent.putExtra("play", "playing");
 				intent.putExtra("id", id);
@@ -180,10 +180,10 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			case TelephonyManager.CALL_STATE_OFFHOOK: /* 接起电话时 */
 				
 			case TelephonyManager.CALL_STATE_RINGING: /* 电话进来时 */
-				Intent intent2 = new Intent(MusicActivity.this,
+				intent = new Intent(MusicActivity.this,
 						MusicService.class);
-				intent2.putExtra("play", "pause");
-				startService(intent2);
+				intent.putExtra("play", "pause");
+				startService(intent);
 				isPlaying = false;
 				imageBtnPlay.setImageResource(R.drawable.play1);
 				replaying=false;
@@ -217,11 +217,11 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			startService(intent);
 			if (replaying) {
 				imageBtnPlay.setImageResource(R.drawable.pause1);
-				///replaying=false;
+				replaying=false;
 				isPlaying = true;
 			} else {
 				imageBtnPlay.setImageResource(R.drawable.play1);
-				//replaying=true;
+				replaying=true;
 				isPlaying=false;
 			}
 			

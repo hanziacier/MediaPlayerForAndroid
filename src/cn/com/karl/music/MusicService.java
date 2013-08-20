@@ -34,15 +34,32 @@ import android.util.Log;
 import android.view.animation.AnimationUtils;
 
 public class MusicService extends Service implements Runnable {
-	private MediaPlayer player;
-	private List<Music> lists;
-	public static int _id = 1; // 当前播放位置
+	private MediaPlayer player;//系统多媒体播放器对象
+	private List<Music> lists;//音乐列表
+	public static int _id = 0; // 当前播放位置
 	public static Boolean isRun = true;
-	public LrcProcess mLrcProcess;
-	public LrcView mLrcView;
+	public LrcProcess mLrcProcess;//歌词处理类
+	public LrcView mLrcView;//歌词视图
 	public static int playing_id = 0;
 	public static Boolean playing = false;
-
+	
+	//---歌词处理----	
+	
+	private List<LrcContent> lrcList = new ArrayList<LrcContent>();// lrc歌词李彪对象	
+	private int lrcListIndex = 0;// 初始化歌词检索值	
+	private int CurrentTime = 0;// 初始化歌曲播放时间的变量	
+	private int CountTime = 0;	// 初始化歌曲总时间的变量
+	Handler mHandler = new Handler();
+	// 歌词滚动线程
+	Runnable mRunnable = new Runnable() {//匿名内部类
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub 测试屏蔽
+			MusicActivity.lrc_view.SetIndex(LrcIndex());
+			MusicActivity.lrc_view.invalidate();
+			mHandler.postDelayed(mRunnable, 200);
+		}
+	};
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -53,11 +70,10 @@ public class MusicService extends Service implements Runnable {
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		lists = MusicList.getMusicData(getApplicationContext());
-
 		SeekBarBroadcastReceiver receiver = new SeekBarBroadcastReceiver();
 		IntentFilter filter = new IntentFilter("cn.com.karl.seekBar");
 		this.registerReceiver(receiver, filter);
-		new Thread(this).start();
+		new Thread(this).start();//开启新的线程执行run方法
 		super.onCreate();
 	}
 
@@ -97,28 +113,7 @@ public class MusicService extends Service implements Runnable {
 		}
 
 	}
-	//---歌词处理----	
-	// 创建对象
-	private List<LrcContent> lrcList = new ArrayList<LrcContent>();
-	// 初始化歌词检索值
-	private int index = 0;
-	// 初始化歌曲播放时间的变量
-	private int CurrentTime = 0;
-	// 初始化歌曲总时间的变量
-	private int CountTime = 0;	
-	Handler mHandler = new Handler();
-	// 歌词滚动线程
-	Runnable mRunnable = new Runnable() {//匿名内部类
 
-		@Override
-		public void run() {
-
-			// TODO Auto-generated method stub 测试屏蔽
-			MusicActivity.lrc_view.SetIndex(LrcIndex());
-			MusicActivity.lrc_view.invalidate();
-			mHandler.postDelayed(mRunnable, 100);
-		}
-	};
 		
 	private void playMusic(int id) {
 
@@ -226,6 +221,7 @@ public class MusicService extends Service implements Runnable {
 
 	}
 
+	//进度条广播接受器（接受进度条变化的广播，依据：注册接收器的过滤器指定）
 	private class SeekBarBroadcastReceiver extends BroadcastReceiver {
 
 		@Override
@@ -285,7 +281,7 @@ public class MusicService extends Service implements Runnable {
 			// 获得歌曲总时间长度
 			CountTime = player.getDuration();
 		}else{
-			return index;
+			return lrcListIndex;
 		}
 		//Log.e("CurrentTime--CountTime--lrcListSize", CurrentTime+"--"+CountTime+"--"+lrcList.size());
 		if (CurrentTime < CountTime) {
@@ -293,20 +289,20 @@ public class MusicService extends Service implements Runnable {
 			for (int i = 0; i < countLrcList; i++) {
 				if (i < countLrcList - 1) {
 					if (CurrentTime < lrcList.get(i).getLrc_time() && i == 0) {
-						index = i;
+						lrcListIndex = i;
 					}
 					if (CurrentTime > lrcList.get(i).getLrc_time()
 							&& CurrentTime < lrcList.get(i + 1).getLrc_time()) {
-						index = i;
+						lrcListIndex = i;
 					}
 				}
 				if (i == countLrcList - 1
 						&& CurrentTime > lrcList.get(i).getLrc_time()) {
-					index = i;
+					lrcListIndex = i;
 				}
 			}
 		}
-		return index;
+		return lrcListIndex;
 	}
 
 }
