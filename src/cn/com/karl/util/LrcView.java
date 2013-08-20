@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -69,7 +70,7 @@ public class LrcView extends TextView {
 	protected void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
 		super.onDraw(canvas);
-
+		Log.e("the lrcView param Index is ",Index+"");
 		if (canvas == null) {
 			return;
 		}

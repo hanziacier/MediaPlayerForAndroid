@@ -28,6 +28,7 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 //import android.os.PowerManager;
 //import android.util.Log;
 import android.view.animation.AnimationUtils;
@@ -86,44 +87,48 @@ public class MusicService extends Service implements Runnable {
 		} else if (play.equals("replaying")) {
 
 		} else if (play.equals("first")) {
-			int id = intent.getIntExtra("id", 0);
-			playMusic(id);
+			playMusic(0);
 		} else if (play.equals("rewind")) {
-			int id = intent.getIntExtra("id", 0);
-			playMusic(id);
+			playMusic(_id-1);
 		} else if (play.equals("forward")) {
-			int id = intent.getIntExtra("id", 0);
-			playMusic(id);
+			playMusic(_id+1);
 		} else if (play.equals("last")) {
-			int id = intent.getIntExtra("id", 0);
-			playMusic(id);
+			playMusic(lists.size()-1);
 		}
 
 	}
+	//---歌词处理----	
+	// 创建对象
+	private List<LrcContent> lrcList = new ArrayList<LrcContent>();
+	// 初始化歌词检索值
+	private int index = 0;
+	// 初始化歌曲播放时间的变量
+	private int CurrentTime = 0;
+	// 初始化歌曲总时间的变量
+	private int CountTime = 0;	
+	Handler mHandler = new Handler();
+	// 歌词滚动线程
+	Runnable mRunnable = new Runnable() {//匿名内部类
 
+		@Override
+		public void run() {
+
+			// TODO Auto-generated method stub 测试屏蔽
+			MusicActivity.lrc_view.SetIndex(LrcIndex());
+			MusicActivity.lrc_view.invalidate();
+			mHandler.postDelayed(mRunnable, 100);
+		}
+	};
+		
 	private void playMusic(int id) {
-
-		// /////////////////////// 初始化歌词配置 /////////////////////// //
-		mLrcProcess = new LrcProcess();
-		// 读取歌词文件
-		//mLrcProcess.readLRC(lists.get(_id).getUrl());
-		// 传回处理后的歌词文件
-		//lrcList = mLrcProcess.getLrcContent();
-		//MusicActivity.lrc_view.setSentenceEntities(lrcList);
-		// 切换带动画显示歌词
-		MusicActivity.lrc_view.setAnimation(AnimationUtils.loadAnimation(
-				MusicService.this, R.anim.alpha_z));
-		// 启动线程
-		mHandler.post(mRunnable);
-		// /////////////////////// 初始化歌词配置 /////////////////////// //
 
 		if (null != player) {
 			player.release();
 			player = null;
-		}
-		if (id >= lists.size() - 1) {
+		}		
+		if (id > lists.size() - 1) {
 			_id = lists.size() - 1;
-		} else if (id <= 0) {
+		} else if (id < 0) {
 			_id = 0;
 		}
 		Music m = lists.get(_id);
@@ -148,8 +153,20 @@ public class MusicService extends Service implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		player.start();
+		// /////////////////////// 初始化歌词配置 /////////////////////// //
+		mLrcProcess = new LrcProcess();		
+		// 读取歌词文件
+		mLrcProcess.readLRC(url);
+		// 传回处理后的歌词文件
+		lrcList = mLrcProcess.getLrcContent();
+		MusicActivity.lrc_view.setSentenceEntities(lrcList);
+		// 切换带动画显示歌词
+		MusicActivity.lrc_view.setAnimation(AnimationUtils.loadAnimation(	MusicService.this, R.anim.alpha_z));
+		// 启动线程
+		mHandler.post(mRunnable);
+		// /////////////////////// 初始化歌词配置 /////////////////////// //
+		
 		player.setOnCompletionListener(new OnCompletionListener() {
 
 			@Override
@@ -215,7 +232,6 @@ public class MusicService extends Service implements Runnable {
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
 			int seekBarPosition = intent.getIntExtra("seekBarPosition", 0);
-			// System.out.println("--------"+seekBarPosition);
 			player.seekTo(seekBarPosition * player.getDuration() / 100);
 			player.start();
 		}
@@ -233,12 +249,19 @@ public class MusicService extends Service implements Runnable {
 				e.printStackTrace();
 			}
 			if (null != player) {
+				if (!player.isPlaying()) {//如果不在播放状态，则停止更新　　
+                  Log.d("player is stoped ","播放器停止播放,跳过获取位置");
+                  break;
+                }
 				int position = player.getCurrentPosition();
 				int total = player.getDuration();
-				Intent intent = new Intent("cn.com.karl.progress");
-				intent.putExtra("position", position);
-				intent.putExtra("total", total);
-				sendBroadcast(intent);
+				if(total>1){
+					Intent intent = new Intent("cn.com.karl.progress");
+					intent.putExtra("position", position);
+					intent.putExtra("total", total);
+					sendBroadcast(intent);//临时屏蔽 调试					
+				}
+
 			}
 			if (null != player) {
 				if (player.isPlaying()) {
@@ -250,42 +273,25 @@ public class MusicService extends Service implements Runnable {
 		}
 	}
 
-	Handler mHandler = new Handler();
-	// 歌词滚动线程
-	Runnable mRunnable = new Runnable() {
 
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			MusicActivity.lrc_view.SetIndex(LrcIndex());
-			MusicActivity.lrc_view.invalidate();
-			mHandler.postDelayed(mRunnable, 100);
-		}
-	};
-
-	// 创建对象
-	private List<LrcContent> lrcList = new ArrayList<LrcContent>();
-	// 初始化歌词检索值
-	private int index = 0;
-	// 初始化歌曲播放时间的变量
-	private int CurrentTime = 0;
-	// 初始化歌曲总时间的变量
-	private int CountTime = 0;
 
 	/**
 	 * 歌词同步处理类
 	 */
-	public int LrcIndex() {
+	public int LrcIndex() {//返回当前播放的音乐在lrcList中的位置
 		if (player.isPlaying()) {
 			// 获得歌曲播放在哪的时间
 			CurrentTime = player.getCurrentPosition();
 			// 获得歌曲总时间长度
 			CountTime = player.getDuration();
+		}else{
+			return index;
 		}
+		//Log.e("CurrentTime--CountTime--lrcListSize", CurrentTime+"--"+CountTime+"--"+lrcList.size());
 		if (CurrentTime < CountTime) {
-
-			for (int i = 0; i < lrcList.size(); i++) {
-				if (i < lrcList.size() - 1) {
+			int countLrcList = lrcList.size();
+			for (int i = 0; i < countLrcList; i++) {
+				if (i < countLrcList - 1) {
 					if (CurrentTime < lrcList.get(i).getLrc_time() && i == 0) {
 						index = i;
 					}
@@ -294,7 +300,7 @@ public class MusicService extends Service implements Runnable {
 						index = i;
 					}
 				}
-				if (i == lrcList.size() - 1
+				if (i == countLrcList - 1
 						&& CurrentTime > lrcList.get(i).getLrc_time()) {
 					index = i;
 				}

@@ -56,7 +56,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	private List<Music> lists;
 	private Boolean isPlaying = false;
 	private static int id = 1;
-	private static int currentId = 2;
+	private static int currentId = -100;
 	private static Boolean replaying=false;
 	private MyProgressBroadCastReceiver receiver;
 	private MyCompletionListner completionListner;
@@ -77,6 +77,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		textSinger = (TextView) this.findViewById(R.id.music_singer);
 		textStartTime = (TextView) this.findViewById(R.id.music_start_time);
 		textEndTime = (TextView) this.findViewById(R.id.music_end_time);
+		
 		seekBar1 = (SeekBar) this.findViewById(R.id.music_seekBar);
 		//icon = (ImageView) this.findViewById(R.id.image_icon);
 		imageBtnLast = (ImageButton) this.findViewById(R.id.music_lasted);
@@ -199,7 +200,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		 receiver=new MyProgressBroadCastReceiver();
+		receiver=new MyProgressBroadCastReceiver();
 		IntentFilter filter=new IntentFilter("cn.com.karl.progress");
 		this.registerReceiver(receiver, filter);
 		
@@ -212,8 +213,9 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			Intent intent = new Intent(MusicActivity.this, MusicService.class);
 			intent.putExtra("play", "replaying");
 			intent.putExtra("id", id);
+			intent.putExtra("total", (int) m.getTime());
 			startService(intent);
-			if (replaying == true) {
+			if (replaying) {
 				imageBtnPlay.setImageResource(R.drawable.pause1);
 				///replaying=false;
 				isPlaying = true;
@@ -228,11 +230,12 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			Music m = lists.get(id);
 			textName.setText(m.getTitle());
 			textSinger.setText(m.getSinger());
-			textEndTime.setText(toTime((int) m.getTime()));
+			textEndTime.setText(toTime((int) m.getTime()));		
 			imageBtnPlay.setImageResource(R.drawable.pause1);
 			Intent intent = new Intent(MusicActivity.this, MusicService.class);
 			intent.putExtra("play", "play");
 			intent.putExtra("id", id);
+			intent.putExtra("total", (int) m.getTime());
 			startService(intent);
 			isPlaying = true;
 			replaying=true;
@@ -248,7 +251,6 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		if(sensors.size()>0){
 			Sensor sensor=sensors.get(0);
 			mRegisteredSensor=sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
-			Log.e("--------------", sensor.getName());
 		}
 	}
 	@Override
@@ -273,11 +275,12 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
 			int position=intent.getIntExtra("position", 0);
-			int total=intent.getIntExtra("total", 0);
+			int total=intent.getIntExtra("total", 100);
 			int progress = position * 100 / total;
 			textStartTime.setText(toTime(position));
 			seekBar1.setProgress(progress);
 			seekBar1.invalidate();
+			//Log.e("seekbar1", progress+"--"+position+"--"+total);
 		}
     	
     }
@@ -416,7 +419,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		int minute = time / 60;
 		//int hour = minute / 60;
 		int second = time % 60;
-		minute %= 60;
+		//minute %= 60;
 		return String.format("%02d:%02d", minute, second);
 	}
 	
@@ -446,7 +449,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			double x=event.values[SensorManager.DATA_X];
 			double y=event.values[SensorManager.DATA_Y];
 			double z=event.values[SensorManager.DATA_Z];
-			Log.e("---------------", "x="+x+"   y="+y+"   z="+z);
+
 			float speed = (float) (Math.abs(x+y+z - last_x - last_y - last_z) / diffTime * 10000);   			  
 			if (speed > SHAKE_THRESHOLD) {   
                         //检测到摇晃后执行的代码

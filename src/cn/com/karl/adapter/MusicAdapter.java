@@ -32,7 +32,7 @@ public class MusicAdapter extends BaseAdapter {
 	@Override
 	public Object getItem(int arg0) {
 		// TODO Auto-generated method stub
-		return listMusic.get(arg0);
+		return this.listMusic.get(arg0);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class MusicAdapter extends BaseAdapter {
 				int minute = time / 60;
 				//int hour = minute / 60;
 				int second = time % 60;
-				minute %= 60;
+				//minute %= 60;
 				return String.format("%02d:%02d", minute, second);
 			}
 }

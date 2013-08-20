@@ -1,11 +1,8 @@
 package cn.com.karl.music;
 
-import java.io.File;
-
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -47,11 +44,11 @@ public class MainActivity extends TabActivity {
                           res.getDrawable(R.drawable.album))
                       .setContent(intent);
         tabHost.addTab(spec);
-        
-        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);  
-        scanIntent.setData(Uri.fromFile(new File("/mnt/sdcard/background02.mp3")));  
-        sendBroadcast(scanIntent);
-        
+        intent = new Intent().setClass(this, FolderActivity.class);
+        spec = tabHost.newTabSpec("≤È’“").setIndicator("≤È’“",
+                          res.getDrawable(R.drawable.folder))
+                      .setContent(intent);
+        tabHost.addTab(spec);      
         tabHost.setCurrentTab(0);
 
     }

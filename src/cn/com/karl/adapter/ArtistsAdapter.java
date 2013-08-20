@@ -55,9 +55,9 @@ public class ArtistsAdapter extends BaseAdapter {
 		//歌手
 		TextView textMusicSinger=(TextView) convertView.findViewById(R.id.music_item_singer);
 		textMusicSinger.setText(m.getAlbum());
-	   /*//持续时间
+	   //持续时间
 		TextView textMusicTime=(TextView) convertView.findViewById(R.id.music_item_time);
-		textMusicTime.setText(toTime((int)m.getTime()));*/
+		textMusicTime.setText(toTime((int)m.getTime()));
 		return convertView;
 	}
 	  /**

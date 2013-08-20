@@ -16,19 +16,18 @@ public class LrcProcess {
 
 	private List<LrcContent> LrcList;
 
-	private LrcContent mLrcContent;
+	private LrcContent mLrcContent;//时间点 歌词 两个元素的类
 
 	public LrcProcess() {
 
-		mLrcContent = new LrcContent();
-		LrcList = new ArrayList<LrcContent>();
+		this.mLrcContent = new LrcContent();
+		this.LrcList = new ArrayList<LrcContent>();
 	}
 
 	/**
 	 * 读取歌词文件的内容
 	 */
 	public String readLRC(String song_path) {
-		// public void Read(String file){
 
 		StringBuilder stringBuilder = new StringBuilder();
 
@@ -41,20 +40,6 @@ public class LrcProcess {
 			BufferedReader br = new BufferedReader(isr);
 			String s = "";
 			while ((s = br.readLine()) != null) {
-				// if ((s.indexOf("[ar:") != -1) || (s.indexOf("[ti:") != -1)
-				// || (s.indexOf("[by:") != -1)) {
-				// s = s.substring(s.indexOf(":") + 1, s.indexOf("]"));
-				// } else {
-				// try {
-				// String ss = s.substring(s.indexOf("["),
-				// s.indexOf("]") + 1);
-				// s = s.replace(ss, "");
-				// } catch (Exception e) {
-				// s = "     ";
-				// }
-				// }
-				// stringBuilder.append(s + "\n");
-
 				// 替换字符
 				s = s.replace("[", "");
 				s = s.replace("]", "@");
@@ -116,7 +101,7 @@ public class LrcProcess {
 
 	public List<LrcContent> getLrcContent() {
 
-		return LrcList;
+		return this.LrcList;
 	}
 
 	/**

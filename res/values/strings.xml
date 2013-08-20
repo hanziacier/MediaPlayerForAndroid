@@ -6,4 +6,6 @@
 	<string name="nosongs">没有音乐播放</string>
 	<string name="default_song">依然爱你</string>
 	<string name="default_star">王力宏</string>
+    <string name="up_one_level">..(返回)</string>
+    <string name="current_dir">.(刷新)</string>	
 </resources>

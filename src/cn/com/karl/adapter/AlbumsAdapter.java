@@ -27,13 +27,13 @@ public class AlbumsAdapter extends BaseAdapter {
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return listMusic.size();
+		return this.listMusic.size();
 	}
 
 	@Override
 	public Object getItem(int arg0) {
 		// TODO Auto-generated method stub
-		return listMusic.get(arg0);
+		return this.listMusic.get(arg0);
 	}
 
 	@Override
@@ -56,9 +56,9 @@ public class AlbumsAdapter extends BaseAdapter {
 		//歌手
 		TextView textMusicSinger=(TextView) convertView.findViewById(R.id.music_item_singer);
 		textMusicSinger.setText(m.getName());
-	   /*//持续时间
+	  
 		TextView textMusicTime=(TextView) convertView.findViewById(R.id.music_item_time);
-		textMusicTime.setText(toTime((int)m.getTime()));*/
+		textMusicTime.setText(toTime((int)m.getTime()));
 		return convertView;
 	}
 	  /**

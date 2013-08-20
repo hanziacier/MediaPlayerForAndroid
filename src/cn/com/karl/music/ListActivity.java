@@ -24,23 +24,22 @@ public class ListActivity extends Activity {
 		setContentView(R.layout.listmusic);
 		
 		this.listView= (ListView) this.findViewById(R.id.listAllMusic);
-		List<Music> listMusic=MusicList.getMusicData(getApplicationContext());
-		System.out.println("listMusic:");
-		System.out.println(listMusic);
+		List<Music> listMusic=MusicList.getMusicData(this);
 		MusicAdapter adapter=new MusicAdapter(this, listMusic);
-		System.out.println("adapter");
-		System.out.println(adapter);
 		this.listView.setAdapter(adapter);
 		this.listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View view, int position,
+					long id) {
 				// TODO Auto-generated method stub
+				if(id == -1) {  
+			        // 点击的是headerView或者footerView  
+			        return;  
+			    }
 				Intent intent = new Intent(ListActivity.this,
 						MusicActivity.class);
-				intent.putExtra("id", arg2);
-				System.out.println("arg0:"+arg0+"arg1:"+arg1+"arg2"+arg2+"arg3"+arg3);
+				intent.putExtra("id", position);
 				startActivity(intent);
 
 				
