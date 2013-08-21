@@ -70,20 +70,15 @@ public class LrcView extends TextView {
 	protected void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
 		super.onDraw(canvas);
-		Log.e("the lrcView param Index is ",Index+"");
 		if (canvas == null) {
 			return;
 		}
-
 		CurrentPaint.setColor(Color.argb(210, 251, 248, 29));
 		NotCurrentPaint.setColor(Color.argb(140, 255, 255, 255));
-
 		CurrentPaint.setTextSize(24);
 		CurrentPaint.setTypeface(Typeface.SERIF);
-
 		NotCurrentPaint.setTextSize(TextSize);
 		NotCurrentPaint.setTypeface(Typeface.DEFAULT);
-
 		try {
 			setText("");
 			canvas.drawText(mSentenceEntities.get(Index).getLrc(), width / 2,

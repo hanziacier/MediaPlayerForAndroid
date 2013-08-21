@@ -19,7 +19,7 @@ public class MusicList {
 		List<Music> musicList = new ArrayList<Music>();
 		ContentResolver cr = context.getContentResolver();
 		if (cr != null) {
-			Log.e("MusicList.getMusicData > uri", MusicList.uri.toString());
+			//Log.e("MusicList.getMusicData > uri", MusicList.uri.toString());
 			// 获取所有歌曲
 			//Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;//INTERNAL_CONTENT_URI,EXTERNAL_CONTENT_URI 分别表示内存和外存的uri
 			Cursor cursor = cr.query(
@@ -56,10 +56,10 @@ public class MusicList {
 						if( cursor.moveToNext()) continue;
 						else break;
 					}
-					String sbr = name.substring(name.length() - 3,
-							name.length());
+					String sbr = name.substring(name.length() - 3);
+					
 					//System.out.println("singer:"+singer+"album:"+album+"size:"+size+"time:"+time+"url:"+url+"name:"+name+"sbr:"+sbr);
-					if (time > 1000 ) {
+					if (sbr.toLowerCase().equalsIgnoreCase("mp3") && time > 1000 ) {
 						m.setTitle(title);
 						m.setSinger(singer);
 						m.setAlbum(album);

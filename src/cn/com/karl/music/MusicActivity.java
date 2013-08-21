@@ -60,7 +60,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	private static Boolean replaying=false;
 	private MyProgressBroadCastReceiver receiver;
 	private MyCompletionListner completionListner;
-	public static Boolean isLoop=true;
+	public static Boolean isLoop=false;//是否为单曲循环
 	private SensorManager sensorManager;
 	private boolean mRegisteredSensor;
 
@@ -78,16 +78,16 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		textStartTime = (TextView) this.findViewById(R.id.music_start_time);
 		textEndTime = (TextView) this.findViewById(R.id.music_end_time);
 		
-		seekBar1 = (SeekBar) this.findViewById(R.id.music_seekBar);
+		seekBar1 = (SeekBar) this.findViewById(R.id.music_seekBar);//进度条
 		//icon = (ImageView) this.findViewById(R.id.image_icon);
 		imageBtnLast = (ImageButton) this.findViewById(R.id.music_lasted);
 		imageBtnRewind = (ImageButton) this.findViewById(R.id.music_rewind);
 		imageBtnPlay = (ImageButton) this.findViewById(R.id.music_play);
 		imageBtnForward = (ImageButton) this.findViewById(R.id.music_foward);
 		imageBtnNext = (ImageButton) this.findViewById(R.id.music_next);
-		imageBtnLoop = (ImageButton) this.findViewById(R.id.music_loop);
+		imageBtnLoop = (ImageButton) this.findViewById(R.id.music_loop);//循环播放
 		seekBarVolume = (SeekBar) this.findViewById(R.id.music_volume);
-		imageBtnRandom = (ImageButton) this.findViewById(R.id.music_random);
+		imageBtnRandom = (ImageButton) this.findViewById(R.id.music_random);//随机播放
 		lrc_view = (LrcView) findViewById(R.id.LyricShow);
 		
 		imageBtnLast.setOnClickListener(new MyListener());
@@ -97,7 +97,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		imageBtnNext.setOnClickListener(new MyListener());
 		imageBtnLoop.setOnClickListener(new MyListener());
 		imageBtnRandom.setOnClickListener(new MyListener());
-		sensorManager=(SensorManager) getSystemService(SENSOR_SERVICE);
+		//sensorManager=(SensorManager) getSystemService(SENSOR_SERVICE);
 
 		lists = MusicList.getMusicData(this);
 		audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -127,10 +127,12 @@ public class MusicActivity extends Activity implements SensorEventListener{
 						progress, AudioManager.FLAG_ALLOW_RINGER_MODES);
 			}
 		});
+		/*
 		//电话状态监听
 		TelephonyManager telManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		telManager.listen(new MobliePhoneStateListener(),
 				PhoneStateListener.LISTEN_CALL_STATE);
+				*/
 		seekBar1.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			
 			@Override
@@ -140,7 +142,6 @@ public class MusicActivity extends Activity implements SensorEventListener{
 				seekBar1.setProgress(seekBar.getProgress());
 				Intent intent=new Intent("cn.com.karl.seekBar");
 				intent.putExtra("seekBarPosition", seekBar.getProgress());
-				//System.out.println("==========="+seekBar.getProgress());
 				sendBroadcast(intent);
 				
 			}
@@ -158,16 +159,19 @@ public class MusicActivity extends Activity implements SensorEventListener{
 				
 			}
 		});
-		 completionListner=new MyCompletionListner();
+		
+		completionListner=new MyCompletionListner();
 		IntentFilter filter=new IntentFilter("cn.com.karl.completion");
 		this.registerReceiver(completionListner, filter);
+		
 	}
+	/*
 	private class MobliePhoneStateListener extends PhoneStateListener {
 		Intent intent;
 		@Override
 		public void onCallStateChanged(int state, String incomingNumber) {
 			switch (state) {
-			case TelephonyManager.CALL_STATE_IDLE: /* 无任何状态时 */
+			case TelephonyManager.CALL_STATE_IDLE: //* 无任何状态时 
 				intent = new Intent(MusicActivity.this,
 						MusicService.class);
 				intent.putExtra("play", "playing");
@@ -177,9 +181,9 @@ public class MusicActivity extends Activity implements SensorEventListener{
 				imageBtnPlay.setImageResource(R.drawable.pause1);
 				replaying=true;
 				break;
-			case TelephonyManager.CALL_STATE_OFFHOOK: /* 接起电话时 */
+			case TelephonyManager.CALL_STATE_OFFHOOK: //* 接起电话时 
 				
-			case TelephonyManager.CALL_STATE_RINGING: /* 电话进来时 */
+			case TelephonyManager.CALL_STATE_RINGING: //* 电话进来时 
 				intent = new Intent(MusicActivity.this,
 						MusicService.class);
 				intent.putExtra("play", "pause");
@@ -196,15 +200,25 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		}
 
 	}
+	*/
 	@Override
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
 		receiver=new MyProgressBroadCastReceiver();
 		IntentFilter filter=new IntentFilter("cn.com.karl.progress");
-		this.registerReceiver(receiver, filter);
-		
+		this.registerReceiver(receiver, filter);		
 		id = getIntent().getIntExtra("id", 1);
+		doPlayById(id);
+		
+	}
+
+	protected void doPlayById(int id){
+		if (id > lists.size() - 1) {
+			id = lists.size() - 1;
+		} else if (id < 0) {
+			id = 0;
+		}		
 		if (id == currentId) {
 			Music m = lists.get(id);
 			textName.setText(m.getTitle());
@@ -240,33 +254,39 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			isPlaying = true;
 			replaying=true;
 			currentId = id;
-		}
-		
+		}		
 	}
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		/*
 		List<Sensor> sensors=sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
 		if(sensors.size()>0){
 			Sensor sensor=sensors.get(0);
 			mRegisteredSensor=sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
 		}
+		*/
 	}
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
+		/*
 		if(mRegisteredSensor){
 			sensorManager.unregisterListener(this);
 			mRegisteredSensor=false;
 		}
+		*/
 		super.onPause();
 	}
+	//protected void onStop(){
+	//	super.onStop();
+	//}
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		this.unregisterReceiver(receiver);
-		this.unregisterReceiver(completionListner);
+		//this.unregisterReceiver(completionListner);
 		super.onDestroy();
 	}
     public class MyProgressBroadCastReceiver extends BroadcastReceiver{
@@ -280,7 +300,6 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			textStartTime.setText(toTime(position));
 			seekBar1.setProgress(progress);
 			seekBar1.invalidate();
-			//Log.e("seekbar1", progress+"--"+position+"--"+total);
 		}
     	
     }
@@ -291,43 +310,23 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			// TODO Auto-generated method stub
 			if (v == imageBtnLast) {
 				// 第一首
-				id = 0;
-				Music m = lists.get(0);
-				textName.setText(m.getTitle());
-				textSinger.setText(m.getSinger());
-				textEndTime.setText(toTime((int) m.getTime()));
-				imageBtnPlay.setImageResource(R.drawable.pause1);
-				Intent intent = new Intent(MusicActivity.this,
-						MusicService.class);
-				intent.putExtra("play", "first");
-				intent.putExtra("id", id);
-				startService(intent);
-				isPlaying = true;
+				doPlayById(0);
 			} else if (v == imageBtnRewind) {
 				// 前一首
-				int id=MusicService._id-1;
-				if(id>=lists.size()-1){
+				id=id-1;
+				if(id>lists.size()-1){
 					id=lists.size()-1;
-				}else if(id<=0){
+				}else if(id<0){
 					id=0;
 				}
-				Music m = lists.get(id);
-				textName.setText(m.getTitle());
-				textSinger.setText(m.getSinger());
-				textEndTime.setText(toTime((int) m.getTime()));
-				imageBtnPlay.setImageResource(R.drawable.pause1);
-				Intent intent = new Intent(MusicActivity.this,
-						MusicService.class);
-				intent.putExtra("play", "rewind");
-				intent.putExtra("id", id);
-				startService(intent);
-				isPlaying = true;
+				doPlayById(id);
 			} else if (v == imageBtnPlay) {
 				// 正在播放
 				if (isPlaying == true) {
 					Intent intent = new Intent(MusicActivity.this,
 							MusicService.class);
 					intent.putExtra("play", "pause");
+					intent.putExtra("id", id);
 					startService(intent);
 					isPlaying = false;
 					imageBtnPlay.setImageResource(R.drawable.play1);
@@ -344,37 +343,17 @@ public class MusicActivity extends Activity implements SensorEventListener{
 				}
 			} else if (v == imageBtnForward) {
 				// 下一首
-				int id=MusicService._id+1;
-				if(id>=lists.size()-1){
+				id=id+1;
+				if(id>lists.size()-1){
 					id=lists.size()-1;
-				}else if(id<=0){
+				}else if(id<0){
 					id=0;
 				}
-				Music m = lists.get(id);
-				textName.setText(m.getTitle());
-				textSinger.setText(m.getSinger());
-				textEndTime.setText(toTime((int) m.getTime()));
-				imageBtnPlay.setImageResource(R.drawable.pause1);
-				Intent intent = new Intent(MusicActivity.this,
-						MusicService.class);
-				intent.putExtra("play", "forward");
-				intent.putExtra("id", id);
-				startService(intent);
-				isPlaying = true;
+				doPlayById(id);
+
 			} else if (v == imageBtnNext) {
 				// 最后一首
-				int id=lists.size()-1;
-				Music m = lists.get(id);
-				textName.setText(m.getTitle());
-				textSinger.setText(m.getSinger());
-				textEndTime.setText(toTime((int) m.getTime()));
-				imageBtnPlay.setImageResource(R.drawable.pause1);
-				Intent intent = new Intent(MusicActivity.this,
-						MusicService.class);
-				intent.putExtra("play", "last");
-				intent.putExtra("id", id);
-				startService(intent);
-				isPlaying = true;
+				doPlayById(lists.size()-1);
 			} else if (v == imageBtnLoop) {
 				if (isLoop == true) {
 					// 顺序播放
@@ -393,16 +372,15 @@ public class MusicActivity extends Activity implements SensorEventListener{
 
 		}
 	}
-   private class MyCompletionListner extends BroadcastReceiver{
+   private class MyCompletionListner extends BroadcastReceiver{//播放完成时service会发送广播给activity，收到后设置下一个歌曲的view信息
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
-		Music m = lists.get(MusicService._id);
-		textName.setText(m.getTitle());
-		textSinger.setText(m.getSinger());
-		textEndTime.setText(toTime((int) m.getTime()));
-		imageBtnPlay.setImageResource(R.drawable.pause1);
+		currentId = -100;//防止完成的就是当前播放的
+		int id = intent.getIntExtra("id", 0);
+		Log.e("completionListner onReceive","id is "+id);
+		doPlayById(id);
 	}
 	   
    }
