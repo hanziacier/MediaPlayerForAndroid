@@ -77,8 +77,14 @@ public class MusicService extends Service implements Runnable {
 	}
 
 	@Override
-	public void onStart(Intent intent, int startId) {
+	public int onStartCommand(Intent intent, int flags, int startId){
+		
 		// TODO Auto-generated method stub
+		Log.e("MusicService onStart", "playing_id is "+playing_id);
+		playing_id ++;
+		if(intent==null){ 
+			Log.e("MusicService onStart", "intent is null");
+		}
 
 		String play = intent.getStringExtra("play");
 		_id = intent.getIntExtra("id", 1);
@@ -87,6 +93,7 @@ public class MusicService extends Service implements Runnable {
 		} else if (_id < 0) {
 			_id = 0;
 		}
+		Log.e("MusicService onStartCommand", "_id is"+_id+"");
 		Music m = lists.get(_id);
 		String url = m.getUrl();
 		
@@ -130,13 +137,16 @@ public class MusicService extends Service implements Runnable {
 		MusicActivity.lrc_view.setAnimation(AnimationUtils.loadAnimation(	MusicService.this, R.anim.alpha_z));
 		// 启动线程
 		mHandler.post(mRunnable);
+
 		// /////////////////////// 初始化歌词配置 /////////////////////// //
+		int returnInt = super.onStartCommand(intent, flags, startId)	;
+		return returnInt;
 
 	}
 
 		
 	private void playMusic(int id) {
-
+		Log.e("MusicService playMusic", "I Get The Id Is "+id);
 		if (null != player) {
 			player.release();
 			player = null;
@@ -148,6 +158,7 @@ public class MusicService extends Service implements Runnable {
 		player = new MediaPlayer();
 		player.reset();
 		player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		Log.e("MusicService playMusic", "before try");
 		try {
 			player.setDataSource(getApplicationContext(), myUri);
 			player.prepare();
@@ -164,7 +175,8 @@ public class MusicService extends Service implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		player.start();		
+		Log.e("MusicService playMusic", "after try");
+			
 		player.setOnCompletionListener(new OnCompletionListener() {
 
 			@Override
@@ -186,9 +198,10 @@ public class MusicService extends Service implements Runnable {
 			}
 		});
 		player.setOnErrorListener(new OnErrorListener() {
-
+			
 			@Override
 			public boolean onError(MediaPlayer mp, int what, int extra) {
+				Log.e("MusicService playMusic onErrorListener", mp.toString());
 				// TODO Auto-generated method stub
 				if (null != player) {
 					player.release();
@@ -221,6 +234,8 @@ public class MusicService extends Service implements Runnable {
 				return false;
 			}
 		});
+		player.start();	
+		Log.e("MusicService playMusic", "after player.start");
 
 	}
 
@@ -247,27 +262,31 @@ public class MusicService extends Service implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (null != player) {
-				if (!player.isPlaying()) {//如果不在播放状态，则停止更新　　
-                  //Log.d("player is stoped ","播放器停止播放,跳过获取位置");
-                  continue;
-                }
-				int position = player.getCurrentPosition();
-				int total = player.getDuration();
-				if(total>1){
-					Intent intent = new Intent("cn.com.karl.progress");
-					intent.putExtra("position", position);
-					intent.putExtra("total", total);
-					sendBroadcast(intent);//临时屏蔽 调试					
-				}
+			try {
+				if (null != player) {
+					if (!player.isPlaying()) {// 如果不在播放状态，则停止更新　　
+						// Log.d("player is stoped ","播放器停止播放,跳过获取位置");
+						continue;
+					}
+					int position = player.getCurrentPosition();
+					int total = player.getDuration();
+					if (total > 1) {
+						Intent intent = new Intent("cn.com.karl.progress");
+						intent.putExtra("position", position);
+						intent.putExtra("total", total);
+						sendBroadcast(intent);// 临时屏蔽 调试
+					}
 
-			}
-			if (null != player) {
-				if (player.isPlaying()) {
-					playing = true;
-				} else {
-					playing = false;
 				}
+				if (null != player) {
+					if (player.isPlaying()) {
+						playing = true;
+					} else {
+						playing = false;
+					}
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
 		}
 	}

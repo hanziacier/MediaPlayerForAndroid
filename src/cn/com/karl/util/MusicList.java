@@ -14,7 +14,17 @@ import android.util.Log;
 import cn.com.karl.domain.Music;
 
 public class MusicList {
-	public static Uri uri=MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+	public static Uri uri=MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+	public static Uri setInternalPath(){
+		return MusicList.setSearchPath(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
+	}
+	public static Uri setExternalPath(){
+		return MusicList.setSearchPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+	}
+	protected static Uri setSearchPath(Uri uri){
+		MusicList.uri =uri;
+		return MusicList.uri;
+	}
 	public static List<Music> getMusicData(Context context) {
 		List<Music> musicList = new ArrayList<Music>();
 		ContentResolver cr = context.getContentResolver();

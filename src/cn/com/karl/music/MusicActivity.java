@@ -127,12 +127,12 @@ public class MusicActivity extends Activity implements SensorEventListener{
 						progress, AudioManager.FLAG_ALLOW_RINGER_MODES);
 			}
 		});
-		/*
+		//*
 		//电话状态监听
 		TelephonyManager telManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 		telManager.listen(new MobliePhoneStateListener(),
 				PhoneStateListener.LISTEN_CALL_STATE);
-				*/
+		//*/
 		seekBar1.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			
 			@Override
@@ -165,11 +165,11 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		this.registerReceiver(completionListner, filter);
 		
 	}
-	/*
+	
 	private class MobliePhoneStateListener extends PhoneStateListener {
 		Intent intent;
 		@Override
-		public void onCallStateChanged(int state, String incomingNumber) {
+		public void onCallStateChanged(int state, String incomingNumber) {//state电话状态 incomingNumber电话号码
 			switch (state) {
 			case TelephonyManager.CALL_STATE_IDLE: //* 无任何状态时 
 				intent = new Intent(MusicActivity.this,
@@ -196,11 +196,12 @@ public class MusicActivity extends Activity implements SensorEventListener{
 				break;
 
 			}
+			 super.onCallStateChanged(state, incomingNumber);
 
 		}
 
 	}
-	*/
+
 	@Override
 	protected void onStart() {
 		// TODO Auto-generated method stub
@@ -218,7 +219,8 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			id = lists.size() - 1;
 		} else if (id < 0) {
 			id = 0;
-		}		
+		}
+		Log.e("doPlayById", "play id is"+id);
 		if (id == currentId) {
 			Music m = lists.get(id);
 			textName.setText(m.getTitle());
@@ -228,6 +230,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			intent.putExtra("play", "replaying");
 			intent.putExtra("id", id);
 			intent.putExtra("total", (int) m.getTime());
+			Log.e("doPlayById", id+"=="+currentId+",now startService doing");
 			startService(intent);
 			if (replaying) {
 				imageBtnPlay.setImageResource(R.drawable.pause1);
@@ -250,6 +253,8 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			intent.putExtra("play", "play");
 			intent.putExtra("id", id);
 			intent.putExtra("total", (int) m.getTime());
+			Log.e("doPlayById", id+"!="+currentId+",now startService doing");
+			Log.e("MusicActivity doPlayById startService", "the intent is "+intent.toString());
 			startService(intent);
 			isPlaying = true;
 			replaying=true;
@@ -279,14 +284,15 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		*/
 		super.onPause();
 	}
-	//protected void onStop(){
-	//	super.onStop();
-	//}
+	protected void onStop(){
+		this.unregisterReceiver(receiver);
+		super.onStop();
+	}
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		this.unregisterReceiver(receiver);
-		//this.unregisterReceiver(completionListner);
+		
+		this.unregisterReceiver(completionListner);
 		super.onDestroy();
 	}
     public class MyProgressBroadCastReceiver extends BroadcastReceiver{
