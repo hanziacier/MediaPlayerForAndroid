@@ -6,11 +6,13 @@ import java.util.List;
 import cn.com.karl.domain.IconifiedText;
 import cn.com.karl.domain.IconifiedTextView;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 //使用BaseAdapter来存储取得的文件
-public class IconifiedTextListAdapter extends BaseAdapter
+public class IconifiedTextListAdapter extends BaseAdapter 
 {
 	private Context				mContext	= null;//上下文环境
 	// 用于显示文件的列表
@@ -58,8 +60,17 @@ public class IconifiedTextListAdapter extends BaseAdapter
 			btv = (IconifiedTextView) convertView;
 			btv.setText(mItems.get(position).getText());
 			btv.setIcon(mItems.get(position).getIcon());
+			btv.setIndex(position);
+			btv.setOnLongClickListener(new OnLongClickListener(){
+				 public boolean onLongClick(View v) {//实现接口中的方法
+
+					 Log.e("ITextListAdapter.onLongClickListener", v.getId()+"");
+					 return true;
+				 }
+			});
 		}
 		return btv;
 	}
+
 }
 

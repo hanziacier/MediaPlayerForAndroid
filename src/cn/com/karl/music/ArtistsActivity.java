@@ -5,7 +5,6 @@ import cn.com.karl.util.MusicList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -21,7 +20,7 @@ public class ArtistsActivity extends Activity {
 		setContentView(R.layout.artist);
 		
 		artistListView=(ListView) this.findViewById(R.id.artistListView);
-		MusicList.uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+		MusicList.setExternalPath();
 		ArtistsAdapter adapter=new ArtistsAdapter(this, MusicList.getMusicData(this));
 		artistListView.setAdapter(adapter);
 		artistListView.setOnItemClickListener(new OnItemClickListener() {

@@ -15,12 +15,14 @@ import java.util.List;
 
 import cn.com.karl.adapter.IconifiedTextListAdapter;
 import cn.com.karl.domain.IconifiedText;
+import cn.com.karl.util.MusicList;
 
 import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -83,12 +85,25 @@ public class FolderActivity extends ListActivity
 		else if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingAudio)))
 		{
 			intent.setDataAndType(Uri.fromFile(file), "audio/*");
+			MusicList.setSearchFilePath(this.currentDirectory); 
+			MusicList.getMusicData(this);
+
+			intent.setClass(this, MusicActivity.class);
 		}
 		else if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingVideo)))
 		{
 			intent.setDataAndType(Uri.fromFile(file), "video/*");
 		}
-		startActivity(intent);
+		MusicList.setSearchFilePath(this.currentDirectory); 
+		MusicList.getMusicData(this);
+		int id = MusicList.getIndex(file);
+		if(id>=0){
+			intent.putExtra("id", id);
+			startActivity(intent);
+		}else{
+			Log.e("FolderActivity", "MusicList.getIndex ERROR");
+		}
+		
 	}
 	//这里可以理解为设置ListActivity的源
 	private void fill(File[] files)
@@ -153,6 +168,7 @@ public class FolderActivity extends ListActivity
 		itla.setListItems(this.directoryEntries);
 		//为ListActivity添加一个ListAdapter
 		this.setListAdapter(itla);
+
 	}
 	
 	protected void onListItemClick(ListView l, View v, int position, long id)
@@ -191,133 +207,22 @@ public class FolderActivity extends ListActivity
 		return false;
 	}
 	
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		super.onCreateOptionsMenu(menu);
-		menu.add(0, 0, 0, "新建目录").setIcon(R.drawable.addfolderr);
-		menu.add(0, 1, 0, "删除目录").setIcon(R.drawable.delete);
-		menu.add(0, 2, 0, "粘贴文件").setIcon(R.drawable.paste);
-		menu.add(0, 3, 0, "根目录").setIcon(R.drawable.goroot);
-		menu.add(0, 4, 0, "上一级").setIcon(R.drawable.uponelevel);
-		return true;
-	}
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		super.onOptionsItemSelected(item);
-		switch (item.getItemId())
-		{
-			case 0:
-				Mynew();
-				break;
-			case 1:
-				//注意：删除目录，谨慎操作，该例子提供了
-				//deleteFile（删除文件）和deleteFolder（删除整个目录）
-				MyDelete();
-				break;
-			case 2:
-				MyPaste();
-				break;
-			case 3:
-				this.browseToRoot();
-				break;
-			case 4:
-				this.upOneLevel();
-				break;
-		}
-		return false;
-	}
+
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
 		return super.onPrepareOptionsMenu(menu);
 	}
-	//粘贴操作
-	public void MyPaste()
-	{}
-	//删除整个文件夹
-	public void MyDelete()
-	{}
-	//新建文件夹
-	public void Mynew()
-	{}
-	//新建文件夹
-	public boolean newFolder(String file)
-	{
-		return true;
-	}
-	//删除文件
-    public boolean deleteFile(File file)
-	{
-    	return true;
-	} 
-    //删除文件夹
-	public boolean deleteFolder(File folder)
-	{
-		return true;
-	} 
 	
 	//处理文件，包括打开，重命名等操作
 	public void fileOptMenu(final File file)
-	{}
+	{
+		openFile(file);
+	}
 	//得到当前目录的绝对路劲
 	public String GetCurDirectory()
 	{
 		return this.currentDirectory.getAbsolutePath();
-	}
-	//移动文件
-	public void moveFile(String source, String destination)
-	{
-		new File(source).renameTo(new File(destination));   
-	}
-	//复制文件
-	public void copyFile(File src, File target)
-	{
-		InputStream in = null;
-		OutputStream out = null;
-
-		BufferedInputStream bin = null;
-		BufferedOutputStream bout = null;
-		try
-		{
-			in = new FileInputStream(src);
-			out = new FileOutputStream(target);
-			bin = new BufferedInputStream(in);
-			bout = new BufferedOutputStream(out);
-
-			byte[] b = new byte[8192];
-			int len = bin.read(b);
-			while (len != -1)
-			{
-				bout.write(b, 0, len);
-				len = bin.read(b);
-			}
-
-		}
-		catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			try
-			{
-				if (bin != null)
-				{
-					bin.close();
-				}
-				if (bout != null)
-				{
-					bout.close();
-				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
 	}
 }

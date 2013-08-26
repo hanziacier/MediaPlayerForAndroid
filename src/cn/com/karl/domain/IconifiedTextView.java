@@ -10,6 +10,7 @@ public class IconifiedTextView extends LinearLayout
 {
 	//一个文件包括文件名和图表
 	//采用一个垂直线性布局
+	private int index = 0;
 	private TextView	mText	= null;
 	private ImageView	mIcon	= null;
 	public IconifiedTextView(Context context, IconifiedText aIconifiedText) 
@@ -43,6 +44,12 @@ public class IconifiedTextView extends LinearLayout
 	public void setIcon(Drawable bullet)
 	{
 		mIcon.setImageDrawable(bullet);
+	}
+	public void setIndex(int id){
+		index =id;
+	}
+	public int getIndex(){
+		return index;
 	}
 }
 
