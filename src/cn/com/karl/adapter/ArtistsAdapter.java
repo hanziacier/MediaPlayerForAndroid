@@ -51,10 +51,10 @@ public class ArtistsAdapter extends BaseAdapter {
 		Music m=listMusic.get(position);
 		//音乐名
 		TextView textMusicName=(TextView) convertView.findViewById(R.id.music_item_name);
-		textMusicName.setText(m.getSinger());
+		textMusicName.setText(m.getSinger());//音乐名称的位置显示歌手的名字
 		//歌手
 		TextView textMusicSinger=(TextView) convertView.findViewById(R.id.music_item_singer);
-		textMusicSinger.setText(m.getAlbum());
+		textMusicSinger.setText(m.getAlbum());//歌手的位置显示专辑的名字
 	   //持续时间
 		TextView textMusicTime=(TextView) convertView.findViewById(R.id.music_item_time);
 		textMusicTime.setText(toTime((int)m.getTime()));
