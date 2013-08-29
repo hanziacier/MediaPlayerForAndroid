@@ -1,20 +1,17 @@
 package cn.com.karl.music;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.widget.AdapterView;
 import cn.com.karl.adapter.IconifiedTextListAdapter;
 import cn.com.karl.domain.IconifiedText;
+import cn.com.karl.domain.IconifiedTextView;
+import cn.com.karl.filter.MusicFileFilter;
 import cn.com.karl.util.MusicList;
 
 import android.app.ListActivity;
@@ -41,7 +38,47 @@ public class FolderActivity extends ListActivity
 	{
 		super.onCreate(icicle);
 		browseToRoot();
-		this.setSelection(0);
+        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view,
+                                           int position, long id) {
+                String selectedFileString = directoryEntries.get(position).getText();
+                final File clickedFile = new File(currentDirectory.getAbsolutePath()+ selectedFileString);
+                if(clickedFile != null && clickedFile.isDirectory()){
+                    File[] mp3Files = clickedFile.listFiles(new MusicFileFilter());
+                    if(mp3Files!=null && mp3Files.length>0) {//所选目录下有MP3文件时
+                        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent();
+                                intent.setAction(android.content.Intent.ACTION_VIEW);
+                                MusicList.setSearchFilePath(clickedFile);
+                                MusicList.getMusicData(FolderActivity.this);
+                                intent.setClass(FolderActivity.this, MusicActivity.class);
+                                intent.putExtra("id", 0);
+                                startActivity(intent);
+                                Log.e("FolderActivity", "onItemLongClick.AlertDialog.OnClickListener " + id);
+
+                            }
+
+                        };
+                        //显示操作菜单
+                        String[] menu = {"播放目录"};
+                        new AlertDialog.Builder(FolderActivity.this)
+                                .setTitle("请选择你要进行的操作")
+                                .setItems(menu, listener)
+                                .show();
+                    }else{//所选目录下没有mp3文件
+                        Log.e("FolderActivity", "onItemLongClick not find mp3 files ");
+                        return false;
+                    }
+                }
+                return false;
+
+
+            }
+        });
+        this.setSelection(0);
 	}
 	//浏览文件系统的根目录
 	private void browseToRoot() 
@@ -129,37 +166,22 @@ public class FolderActivity extends ListActivity
 				}
 				else
 				{
+
 					//取得文件名
 					String fileName = currentFile.getName();
-					//根据文件名来判断文件类型，设置不同的图标
-					if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingImage)))
-					{
-						currentIcon = getResources().getDrawable(R.drawable.image);
-					}
-					else if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingWebText)))
-					{
-						currentIcon = getResources().getDrawable(R.drawable.webtext);
-					}
-					else if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingPackage)))
-					{
-						currentIcon = getResources().getDrawable(R.drawable.packed);
-					}
-					else if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingAudio)))
-					{
+                    if(new MusicFileFilter().accept(fileName)){
 						currentIcon = getResources().getDrawable(R.drawable.audio);
-					}
-					else if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingVideo)))
-					{
-						currentIcon = getResources().getDrawable(R.drawable.video);
-					}
-					else
-					{
-						currentIcon = getResources().getDrawable(R.drawable.text);
-					}
+					}else{
+                        continue;
+                    }
+
 				}
 				//确保只显示文件名、不显示路径如：/sdcard/111.txt就只是显示111.txt
 				int currentPathStringLenght = this.currentDirectory.getAbsolutePath().length();
-				this.directoryEntries.add(new IconifiedText(currentFile.getAbsolutePath().substring(currentPathStringLenght), currentIcon));
+				this.directoryEntries.add(
+                        new IconifiedText(currentFile.getAbsolutePath().substring(currentPathStringLenght),
+                                        currentIcon)
+                );
 			}
 		}
 		Collections.sort(this.directoryEntries);//directoryentries支持sort 应为iconifiedtext 实现了compareTo方法
@@ -171,7 +193,8 @@ public class FolderActivity extends ListActivity
 
 	}
 	
-	protected void onListItemClick(ListView l, View v, int position, long id)
+	@Override
+    protected void onListItemClick(ListView l, View v, int position, long id)
 	{
 		super.onListItemClick(l, v, position, id);
 		// 取得选中的一项的文件名

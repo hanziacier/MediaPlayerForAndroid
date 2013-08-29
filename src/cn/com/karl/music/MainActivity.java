@@ -27,7 +27,7 @@ public class MainActivity extends TabActivity {
                           res.getDrawable(R.drawable.item))
                       .setContent(intent);
         tabHost.addTab(spec);
-        
+
         intent = new Intent().setClass(this, ArtistsActivity.class);
         spec = tabHost.newTabSpec("艺术家").setIndicator("艺术家",
                           res.getDrawable(R.drawable.artist))

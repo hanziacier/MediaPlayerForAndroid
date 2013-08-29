@@ -61,13 +61,7 @@ public class IconifiedTextListAdapter extends BaseAdapter
 			btv.setText(mItems.get(position).getText());
 			btv.setIcon(mItems.get(position).getIcon());
 			btv.setIndex(position);
-			btv.setOnLongClickListener(new OnLongClickListener(){
-				 public boolean onLongClick(View v) {//实现接口中的方法
 
-					 Log.e("ITextListAdapter.onLongClickListener", v.getId()+"");
-					 return true;
-				 }
-			});
 		}
 		return btv;
 	}

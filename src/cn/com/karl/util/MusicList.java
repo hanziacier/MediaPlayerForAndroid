@@ -2,6 +2,7 @@ package cn.com.karl.util;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.content.ContentResolver;
@@ -14,12 +15,16 @@ import android.util.Log;
 
 import cn.com.karl.domain.IconifiedText;
 import cn.com.karl.domain.Music;
+import cn.com.karl.filter.MusicFileFilter;
 import cn.com.karl.music.R;
+
+
 
 public class MusicList {
 	protected static Uri uri=MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;//音乐检索路径 默认为sd卡
 	protected static File uriFile ;//检索路径，在不使用（无法使用）媒体库查询时使用目录遍历的方式
 	protected static List<Music> musicList;//检索出的音乐列表
+    public final static int ErrorID = -100;
 	public static Uri setInternalPath(){
 		if(MusicList.uri != MediaStore.Audio.Media.INTERNAL_CONTENT_URI){
 			MusicList.setSearchPath(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
@@ -55,6 +60,7 @@ public class MusicList {
 	}
 	public static void setMusicList(List<Music> list){
 		MusicList.musicList = list;
+        Collections.sort(MusicList.musicList);
 	}
 	public static List<Music> getMusicData(Context context) {
 		if(MusicList.musicList !=null) return MusicList.musicList;
@@ -62,9 +68,10 @@ public class MusicList {
 			if(MusicList.uri.equals(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI) || 
 			MusicList.uri.equals(MediaStore.Audio.Media.INTERNAL_CONTENT_URI)){
 				MusicList.musicList = MusicList.getMusicDataFromContentResolver(context);
+                Collections.sort(MusicList.musicList);
 			}else{
 				MusicList.musicList = MusicList.getMusicDataFromDir(MusicList.uriFile);
-				//MusicList.musicList = MusicList.getMusicDataFromContentResolver(context);
+                Collections.sort(MusicList.musicList);
 			}
 		}
 
@@ -113,10 +120,7 @@ public class MusicList {
 						if( cursor.moveToNext()) continue;
 						else break;
 					}
-					String sbr = name.substring(name.length() - 3);
-					
-					Log.e("MusicList","url:"+url+" title:"+title);
-					if (sbr.toLowerCase().equalsIgnoreCase("mp3") && time > 1000 ) {
+					if (new MusicFileFilter().accept(name) ) {
 						m.setTitle(title);
 						m.setSinger(singer);
 						m.setAlbum(album);
@@ -133,7 +137,7 @@ public class MusicList {
 	}
 	protected static List<Music> getMusicDataFromDir(File dir){
 		List<Music> musicList = new ArrayList<Music>();
-		File[] files = dir.listFiles();
+		File[] files = dir.listFiles(new MusicFileFilter());
 		Log.e("MusicList.getMusicDataFromDirUri.dir", dir.toString());
 		Log.e("MusicList.getMusicDataFromDirUri.files", files.toString());
 		if(files != null){
@@ -149,21 +153,18 @@ public class MusicList {
 				{
 					//取得文件名
 					String fileName = currentFile.getName();
-					//根据文件名来判断文件类型，设置不同的图标
-					if(fileName.substring(fileName.length() - 3).toLowerCase().equalsIgnoreCase("mp3"))
-					{
-						Music m = new Music();
-						//确保只显示文件名、不显示路径如：/sdcard/111.txt就只是显示111.txt
-						m.setTitle(fileName);
-						m.setSinger("未知艺术家");
-						//m.setAlbum(album);
-						//m.setSize(size);
-						//m.setTime(time);
-						m.setUrl(currentFile.getAbsolutePath());
-						//m.setName(name);
-						musicList.add(m);
-						Log.e("MusicList.getMusicDataFromDirUri.music",m.getUrl().toString());
-					}
+
+                    Music m = new Music();
+                    m.setTitle(fileName);
+                    m.setSinger("未知艺术家");
+                    //m.setAlbum(album);
+                    //m.setSize(size);
+                    //m.setTime(time);
+                    m.setUrl(currentFile.getAbsolutePath());
+                    //m.setName(name);
+                    musicList.add(m);
+                    Log.e("MusicList.getMusicDataFromDirUri.music",m.getUrl().toString());
+
 					
 				}
 				
@@ -172,8 +173,8 @@ public class MusicList {
 		return musicList;
 	}
 	public static int getIndex(File file){
-		int index = -100;
-		if(MusicList.musicList.isEmpty()) return index;
+
+		if(MusicList.musicList.isEmpty()) return MusicList.ErrorID;
 		int i=0;
 		for(Music m:MusicList.musicList){
 			if(m.getUrl().equals(file.getAbsolutePath())){
@@ -181,6 +182,6 @@ public class MusicList {
 			}
 			i++;
 		}
-		return index;
+		return MusicList.ErrorID;
 	}
 }

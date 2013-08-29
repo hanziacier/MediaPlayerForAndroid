@@ -30,9 +30,8 @@ public class LrcProcess {
 	public String readLRC(String song_path) {
 
 		StringBuilder stringBuilder = new StringBuilder();
-
-		File f = new File(song_path.replace(".mp3", ".lrc"));
-		
+        String lrcFile = song_path.substring(0,song_path.lastIndexOf("."))+".lrc";
+        File f = new File(lrcFile);
 
 		try {
 			FileInputStream fis = new FileInputStream(f);

@@ -1,8 +1,7 @@
 package cn.com.karl.domain;
 
-public class Music  {
-  
-	private String title;
+public class Music implements Comparable<Music> {
+	private String title="";
 	private String singer;
 	private String album;
 	private String url;
@@ -52,5 +51,12 @@ public class Music  {
 	public void setTime(long time) {
 		this.time = time;
 	}
-	
+    //比较文件名是否相同
+    public int compareTo(Music other)
+    {
+        if (this.title != null)
+            return this.title.compareTo(other.getTitle());
+        else
+            throw new IllegalArgumentException();
+    }
 }

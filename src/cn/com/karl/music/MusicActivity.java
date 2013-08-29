@@ -56,7 +56,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	private List<Music> lists;
 	private Boolean isPlaying = false;
 	private static int id = 1;
-	private static int currentId = -100;
+	private static int currentId = MusicList.ErrorID;
 	private static Boolean replaying=false;
 	private MyProgressBroadCastReceiver receiver;
 	private MyCompletionListner completionListner;
@@ -383,7 +383,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
-		currentId = -100;//防止完成的就是当前播放的
+		currentId = MusicList.ErrorID;//防止完成的就是当前播放的
 		int id = intent.getIntExtra("id", 0);
 		Log.e("completionListner onReceive","id is "+id);
 		doPlayById(id);
