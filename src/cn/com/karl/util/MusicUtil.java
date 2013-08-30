@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.util.Log;
 import cn.com.karl.music.R;
 
 /**
@@ -24,14 +25,18 @@ public class MusicUtil {
     private static final BitmapFactory.Options sBitmapOptions = new BitmapFactory.Options();
     private static Bitmap mCachedBit = null;
 
-    public static Bitmap getArtwork(Context context, long song_id,
-                                    long album_id,
-                                    boolean allowdefault) {
-        if (album_id < 0) {
+    public static Bitmap getArtwork(Context context, long song_id,//音乐在媒体库中的id
+                                    long album_id,//音乐在媒体库中专辑id
+                                    boolean allowdefault//是否使用默认专辑图
+    )
+    {
+        Bitmap bm;
+        Log.e("MusicUtil","song_id album_id "+song_id+" ,"+album_id);
+        if (album_id < 0) {//不存在专辑id时 使用使用插入在音乐文件中的图或者默认专辑图
             // This is something that is not in the database, so get the album art directly
             // from the file.
             if (song_id >= 0) {
-                Bitmap bm = getArtworkFromFile(context, song_id, -1);
+                bm = getArtworkFromFile(context, song_id, -1);
                 if (bm != null) {
                     return bm;
                 }
@@ -41,17 +46,20 @@ public class MusicUtil {
             }
             return null;
         }
+        /**以下代码时存在专辑id时的方式**/
         ContentResolver res = context.getContentResolver();
         Uri uri = ContentUris.withAppendedId(sArtworkUri, album_id);
         if (uri != null) {
             InputStream in = null;
             try {
                 in = res.openInputStream(uri);
-                return BitmapFactory.decodeStream(in, null, sBitmapOptions);
+                bm = BitmapFactory.decodeStream(in, null, sBitmapOptions);
+                if(bm !=null) return bm;
+                throw new FileNotFoundException();//抛出错误 进入catch
             } catch (FileNotFoundException ex) {
                 // The album art thumbnail does not actually exist. Maybe the user deleted it, or
                 // maybe it never existed to begin with.
-                Bitmap bm = getArtworkFromFile(context, song_id, album_id);
+                bm = getArtworkFromFile(context, song_id, album_id);
                 if (bm != null) {
                     if (bm.getConfig() == null) {
                         bm = bm.copy(Bitmap.Config.RGB_565, false);

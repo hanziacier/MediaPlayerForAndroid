@@ -11,12 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import cn.com.karl.util.MusicList;
 
-public class MusicAdapter extends BaseAdapter {
+public class ListAdapter extends BaseAdapter {
 	
     private List<Music> listMusic;
     private Context context;
-    public MusicAdapter(Context context,List<Music> listMusic){
+    public ListAdapter(Context context, List<Music> listMusic){
     	this.context=context;
     	this.listMusic=listMusic;
     }
@@ -51,10 +52,10 @@ public class MusicAdapter extends BaseAdapter {
 		Music m=listMusic.get(position);
 		//音乐名
 		TextView textMusicName=(TextView) convertView.findViewById(R.id.music_item_name);
-		textMusicName.setText(m.getName());
+		textMusicName.setText(m.getTitle());
 		//歌手
 		TextView textMusicSinger=(TextView) convertView.findViewById(R.id.music_item_singer);
-		textMusicSinger.setText(m.getSinger());
+		textMusicSinger.setText(m.getSinger().compareTo(MusicList.defaultSinger) == 0 ? m.getAlbum() : m.getSinger());
 	   //持续时间
 		TextView textMusicTime=(TextView) convertView.findViewById(R.id.music_item_time);
 		textMusicTime.setText(toTime((int)m.getTime()));

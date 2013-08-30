@@ -2,6 +2,7 @@ package cn.com.karl.domain;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,7 +29,8 @@ public class IconifiedTextView extends LinearLayout
 				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		//设置文件名、填充方式、字体大小
 		mText = new TextView(context);
-		mText.setText(aIconifiedText.getText());
+        //Log.e("IconifiedTextView","TextView "+aIconifiedText.getText());
+        mText.setText(aIconifiedText.getText());
 		mText.setPadding(8, 6, 6, 10); 
 		mText.setTextSize(26);
 		//将文件名添加到布局中

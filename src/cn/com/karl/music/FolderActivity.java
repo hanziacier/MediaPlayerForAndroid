@@ -109,30 +109,16 @@ public class FolderActivity extends ListActivity
 	//打开指定文件
 	protected void openFile(File aFile)
 	{
-		Intent intent = new Intent();
-		intent.setAction(android.content.Intent.ACTION_VIEW);
+
 		File file = new File(aFile.getAbsolutePath());
 		// 取得文件名
 		String fileName = file.getName();
 		// 根据不同的文件类型来打开文件
-		if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingImage)))
-		{
-			intent.setDataAndType(Uri.fromFile(file), "image/*");
-		}
-		else if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingAudio)))
-		{
-			intent.setDataAndType(Uri.fromFile(file), "audio/*");
-			MusicList.setSearchFilePath(this.currentDirectory); 
-			MusicList.getMusicData(this);
-
-			intent.setClass(this, MusicActivity.class);
-		}
-		else if (checkEndsWithInStringArray(fileName, getResources().getStringArray(R.array.fileEndingVideo)))
-		{
-			intent.setDataAndType(Uri.fromFile(file), "video/*");
-		}
-		MusicList.setSearchFilePath(this.currentDirectory); 
-		MusicList.getMusicData(this);
+        MusicList.setSearchFilePath(this.currentDirectory);
+        MusicList.getMusicData(this);
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setClass(this, MusicActivity.class);
 		int id = MusicList.getIndex(file);
 		if(id>=0){
 			intent.putExtra("id", id);
@@ -178,6 +164,7 @@ public class FolderActivity extends ListActivity
 				}
 				//确保只显示文件名、不显示路径如：/sdcard/111.txt就只是显示111.txt
 				int currentPathStringLenght = this.currentDirectory.getAbsolutePath().length();
+                Log.e("FolderActivity","IconifiedText "+currentFile.getAbsolutePath().substring(currentPathStringLenght));
 				this.directoryEntries.add(
                         new IconifiedText(currentFile.getAbsolutePath().substring(currentPathStringLenght),
                                         currentIcon)

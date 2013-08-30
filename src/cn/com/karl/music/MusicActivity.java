@@ -3,7 +3,8 @@ package cn.com.karl.music;
 import java.util.List;
 
 
-
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import cn.com.karl.domain.Music;
 import cn.com.karl.util.LrcView;
 import cn.com.karl.util.MusicList;
@@ -32,6 +33,7 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import cn.com.karl.util.MusicUtil;
 
 public class MusicActivity extends Activity implements SensorEventListener{
 
@@ -221,8 +223,8 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			id = 0;
 		}
 		Log.e("doPlayById", "play id is"+id);
+        Music m = lists.get(id);
 		if (id == currentId) {
-			Music m = lists.get(id);
 			textName.setText(m.getTitle());
 			textSinger.setText(m.getSinger());
 			textEndTime.setText(toTime((int) m.getTime()));
@@ -244,7 +246,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			
 			
 		} else {
-			Music m = lists.get(id);
+
 			textName.setText(m.getTitle());
 			textSinger.setText(m.getSinger());
 			textEndTime.setText(toTime((int) m.getTime()));		
@@ -253,13 +255,18 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			intent.putExtra("play", "play");
 			intent.putExtra("id", id);
 			intent.putExtra("total", (int) m.getTime());
-			Log.e("doPlayById", id+"!="+currentId+",now startService doing");
-			Log.e("MusicActivity doPlayById startService", "the intent is "+intent.toString());
+
 			startService(intent);
 			isPlaying = true;
 			replaying=true;
 			currentId = id;
-		}		
+		}
+        Bitmap bm = MusicUtil.getArtwork(this, m.getId(), m.getAlbumid(),false);
+        if(bm != null){
+            Log.e("MusicActivity","I Have Get The Bitmap ,The SongId Is "+m.getId());
+            lrc_view.setBackgroundDrawable(new BitmapDrawable(bm));
+        }
+
 	}
 	@Override
 	protected void onResume() {
@@ -303,6 +310,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			int position=intent.getIntExtra("position", 0);
 			int total=intent.getIntExtra("total", 100);
 			int progress = position * 100 / total;
+            textEndTime.setText(toTime(total));
 			textStartTime.setText(toTime(position));
 			seekBar1.setProgress(progress);
 			seekBar1.invalidate();

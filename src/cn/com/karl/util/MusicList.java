@@ -25,6 +25,7 @@ public class MusicList {
 	protected static File uriFile ;//检索路径，在不使用（无法使用）媒体库查询时使用目录遍历的方式
 	protected static List<Music> musicList;//检索出的音乐列表
     public final static int ErrorID = -100;
+    public static final String defaultSinger = "未知艺术家";
 	public static Uri setInternalPath(){
 		if(MusicList.uri != MediaStore.Audio.Media.INTERNAL_CONTENT_URI){
 			MusicList.setSearchPath(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
@@ -103,7 +104,7 @@ public class MusicList {
 							.getColumnIndex(MediaStore.Audio.Media.ARTIST));
 
 					if ("<unknown>".equals(singer)) {
-						singer = "未知艺术家";
+						singer = MusicList.defaultSinger;
 					}
 					String album = cursor.getString(cursor
 							.getColumnIndex(MediaStore.Audio.Media.ALBUM));
@@ -128,6 +129,12 @@ public class MusicList {
 						m.setTime(time);
 						m.setUrl(url);
 						m.setName(name);
+                        m.setAlbumid(cursor
+                                .getLong(cursor
+                                        .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
+                        m.setId(cursor
+                                .getLong(cursor
+                                        .getColumnIndex(MediaStore.Audio.Media._ID)));
 						musicList.add(m);
 					}
 				} while (cursor.moveToNext());
@@ -156,7 +163,8 @@ public class MusicList {
 
                     Music m = new Music();
                     m.setTitle(fileName);
-                    m.setSinger("未知艺术家");
+                    m.setSinger(MusicList.defaultSinger);
+                    m.setDirPath(dir.toString());
                     //m.setAlbum(album);
                     //m.setSize(size);
                     //m.setTime(time);

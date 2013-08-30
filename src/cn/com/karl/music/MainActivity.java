@@ -45,7 +45,7 @@ public class MainActivity extends TabActivity {
                       .setContent(intent);
         tabHost.addTab(spec);
         intent = new Intent().setClass(this, FolderActivity.class);
-        spec = tabHost.newTabSpec("查找").setIndicator("查找",
+        spec = tabHost.newTabSpec("目录").setIndicator("目录",
                           res.getDrawable(R.drawable.folder))
                       .setContent(intent);
         tabHost.addTab(spec);      

@@ -2,7 +2,7 @@ package cn.com.karl.music;
 
 import java.util.List;
 
-import cn.com.karl.adapter.MusicAdapter;
+import cn.com.karl.adapter.ListAdapter;
 import cn.com.karl.domain.Music;
 import cn.com.karl.util.MusicList;
 import android.app.Activity;
@@ -25,7 +25,7 @@ public class ListActivity extends Activity {
 		
 		this.listView= (ListView) this.findViewById(R.id.listAllMusic);
 		List<Music> listMusic=MusicList.getMusicData(this);
-		MusicAdapter adapter=new MusicAdapter(this, listMusic);
+		ListAdapter adapter=new ListAdapter(this, listMusic);
 		this.listView.setAdapter(adapter);
 		this.listView.setOnItemClickListener(new OnItemClickListener() {
 
