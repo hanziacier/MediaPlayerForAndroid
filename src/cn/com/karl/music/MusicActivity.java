@@ -222,7 +222,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		} else if (id < 0) {
 			id = 0;
 		}
-		Log.e("doPlayById", "play id is"+id);
+		Log.e("doPlayById", "play id is "+id);
         Music m = lists.get(id);
 		if (id == currentId) {
 			textName.setText(m.getTitle());
@@ -245,7 +245,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			}
 			
 			
-		} else {
+		}else {
 
 			textName.setText(m.getTitle());
 			textSinger.setText(m.getSinger());
@@ -259,7 +259,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			startService(intent);
 			isPlaying = true;
 			replaying=true;
-			currentId = id;
+			currentId = id;//更新当前播放的序列ID
 		}
         Bitmap bm = MusicUtil.getArtwork(this, m.getId(), m.getAlbumid(),false);
         if(bm != null){

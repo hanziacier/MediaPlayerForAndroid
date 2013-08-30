@@ -35,12 +35,11 @@ import android.view.animation.AnimationUtils;
 
 public class MusicService extends Service implements Runnable {
 	private MediaPlayer player;//系统多媒体播放器对象
-	private List<Music> lists;//音乐列表
-	public static int _id = 0; // 当前播放位置
+
+	public static int _id = 0; // 当前播放在lists中位置
 	public static Boolean isRun = true;
 	public LrcProcess mLrcProcess;//歌词处理类
 	public LrcView mLrcView;//歌词视图
-	public static int playing_id = 0;
 	public static Boolean playing = false;
 	
 	//---歌词处理----//		
@@ -68,7 +67,7 @@ public class MusicService extends Service implements Runnable {
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
-		lists = MusicList.getMusicData(getApplicationContext());
+
 		SeekBarBroadcastReceiver receiver = new SeekBarBroadcastReceiver();
 		IntentFilter filter = new IntentFilter("cn.com.karl.seekBar");
 		this.registerReceiver(receiver, filter);
@@ -80,21 +79,22 @@ public class MusicService extends Service implements Runnable {
 	public int onStartCommand(Intent intent, int flags, int startId){
 		
 		// TODO Auto-generated method stub
-		Log.e("MusicService onStart", "playing_id is "+playing_id);
-		playing_id ++;
-		if(intent==null){ 
-			Log.e("MusicService onStart", "intent is null");
+
+		if(intent==null){
+            Log.e("MusicService onStart", "intent is null");
+            return super.onStartCommand(intent, flags, startId)	;
+
 		}
 
 		String play = intent.getStringExtra("play");
 		_id = intent.getIntExtra("id", 1);
-		if (_id > lists.size() - 1) {
-			_id = lists.size() - 1;
+		if (_id > MusicList.getMusicList().size() - 1) {
+			_id = MusicList.getMusicList().size() - 1;
 		} else if (_id < 0) {
 			_id = 0;
 		}
 		Log.e("MusicService onStartCommand", "_id is"+_id+"");
-		Music m = lists.get(_id);
+		Music m = MusicList.getMusicList().get(_id);
 		String url = m.getUrl();
 		
 		if (play.equals("play")) {
@@ -123,7 +123,7 @@ public class MusicService extends Service implements Runnable {
 		} else if (play.equals("forward")) {
 			playMusic(_id+1);
 		} else if (play.equals("last")) {
-			playMusic(lists.size()-1);
+			playMusic(MusicList.getMusicList().size()-1);
 		}
 		// /////////////////////// 初始化歌词配置 /////////////////////// //
 
@@ -152,7 +152,7 @@ public class MusicService extends Service implements Runnable {
 			player = null;
 		}		
 
-		Music m = lists.get(id);
+		Music m = MusicList.getMusicList().get(id);
 		String url = m.getUrl();
 		Uri myUri = Uri.parse(url);
 		player = new MediaPlayer();
@@ -207,7 +207,7 @@ public class MusicService extends Service implements Runnable {
 					player.release();
 					player = null;
 				}
-				Music m = lists.get(_id);
+				Music m = MusicList.getMusicList().get(_id);
 				String url = m.getUrl();
 				Uri myUri = Uri.parse(url);
 				player = new MediaPlayer();

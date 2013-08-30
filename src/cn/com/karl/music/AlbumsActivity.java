@@ -18,7 +18,7 @@ public class AlbumsActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.albums);
-		
+        MusicList.setExternalPath();
 		albumListView=(ListView) this.findViewById(R.id.albumListView);
 		AlbumsAdapter adapter=new AlbumsAdapter(this, MusicList.getMusicData(this));
 		albumListView.setAdapter(adapter);

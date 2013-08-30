@@ -18,8 +18,8 @@
             android:layout_below="@+id/linearLayout1"
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="110dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="90dp"
             android:gravity="center_horizontal"
             android:text="@string/nosongs" 
             android:textColor="#99ffffff"/>

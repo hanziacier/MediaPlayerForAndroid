@@ -1,27 +1,24 @@
 package cn.com.karl.util;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.provider.MediaStore.Files;
 import android.util.Log;
 
-import cn.com.karl.domain.IconifiedText;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import cn.com.karl.domain.Music;
 import cn.com.karl.filter.MusicFileFilter;
-import cn.com.karl.music.R;
 
 
 
 public class MusicList {
-	protected static Uri uri=MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;//音乐检索路径 默认为sd卡
+	protected static Uri uri;//音乐检索路径 默认为sd卡
 	protected static File uriFile ;//检索路径，在不使用（无法使用）媒体库查询时使用目录遍历的方式
 	protected static List<Music> musicList;//检索出的音乐列表
     public final static int ErrorID = -100;
@@ -64,7 +61,7 @@ public class MusicList {
         Collections.sort(MusicList.musicList);
 	}
 	public static List<Music> getMusicData(Context context) {
-		if(MusicList.musicList !=null) return MusicList.musicList;
+		if(MusicList.musicList != null) return MusicList.musicList;
 		else{
 			if(MusicList.uri.equals(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI) || 
 			MusicList.uri.equals(MediaStore.Audio.Media.INTERNAL_CONTENT_URI)){
@@ -192,4 +189,8 @@ public class MusicList {
 		}
 		return MusicList.ErrorID;
 	}
+    public static List<Music> getMusicList(){
+        return MusicList.musicList;
+
+    }
 }

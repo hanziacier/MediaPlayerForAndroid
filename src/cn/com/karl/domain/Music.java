@@ -53,8 +53,11 @@ public class Music implements Comparable<Music> {
 	}
 	public void setAlbum(String album) {
 		this.album = album;
-        if(!album.isEmpty()) this.setDirPath(album);
-	}
+        if (album.length()==0) {
+            return;
+        }
+        this.setDirPath(album);
+    }
 	public String getUrl() {
 		return url;
 	}
@@ -76,7 +79,7 @@ public class Music implements Comparable<Music> {
     //比较文件名是否相同
     public int compareTo(Music other)
     {
-        if(!other.getDirPath().isEmpty() && !this.dirPath.isEmpty() ){
+        if(!(other.getDirPath().length()==0 || this.dirPath.length()==0)){
             int dirCompare = this.dirPath.compareTo(other.getDirPath());
             if(dirCompare != 0) return dirCompare;
         }
