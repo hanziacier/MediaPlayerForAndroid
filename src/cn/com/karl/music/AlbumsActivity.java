@@ -20,7 +20,7 @@ public class AlbumsActivity extends Activity {
 		setContentView(R.layout.albums);
         MusicList.setExternalPath();
 		albumListView=(ListView) this.findViewById(R.id.albumListView);
-		AlbumsAdapter adapter=new AlbumsAdapter(this, MusicList.getMusicData(this));
+		AlbumsAdapter adapter=new AlbumsAdapter(AlbumsActivity.this, MusicList.getMusicData(AlbumsActivity.this));
 		albumListView.setAdapter(adapter);
 		albumListView.setOnItemClickListener(new OnItemClickListener() {
 

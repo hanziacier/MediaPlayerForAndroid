@@ -24,7 +24,7 @@ public class ListActivity extends Activity {
 		setContentView(R.layout.listmusic);
 		
 		this.listView= (ListView) this.findViewById(R.id.listAllMusic);
-        MusicList.setExternalPath();
+        MusicList.setInternalPath();
 		List<Music> listMusic=MusicList.getMusicData(this);
 		ListAdapter adapter=new ListAdapter(this, listMusic);
 		this.listView.setAdapter(adapter);

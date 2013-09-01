@@ -18,10 +18,9 @@ public class ArtistsActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.artist);
-		
+        MusicList.setExternalPath();
 		artistListView=(ListView) this.findViewById(R.id.artistListView);
-		MusicList.setExternalPath();
-		ArtistsAdapter adapter=new ArtistsAdapter(this, MusicList.getMusicData(this));
+		ArtistsAdapter adapter=new ArtistsAdapter(ArtistsActivity.this, MusicList.getMusicData(ArtistsActivity.this));
 		artistListView.setAdapter(adapter);
 		artistListView.setOnItemClickListener(new OnItemClickListener() {
 

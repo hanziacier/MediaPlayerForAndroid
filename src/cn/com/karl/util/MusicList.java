@@ -24,30 +24,23 @@ public class MusicList {
     public final static int ErrorID = -100;
     public static final String defaultSinger = "未知艺术家";
 	public static Uri setInternalPath(){
-		if(MusicList.uri != MediaStore.Audio.Media.INTERNAL_CONTENT_URI){
-			MusicList.setSearchPath(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
-			MusicList.clearMusicList();
-		}
-		return MusicList.uri;		
+        MusicList.setSearchUri(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
+        MusicList.clearMusicList();
+		return MusicList.uri;
 	}
 	public static Uri setExternalPath(){
-		if(MusicList.uri != MediaStore.Audio.Media.EXTERNAL_CONTENT_URI){
-			MusicList.setSearchPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-			MusicList.clearMusicList();
-		}
+        MusicList.setSearchUri(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+        MusicList.clearMusicList();
 		return MusicList.uri;
-		
 	}
 	public static Uri setSearchFilePath(File currentDirectory){
 		Uri currentUri = Uri.fromFile(currentDirectory);
-		if(MusicList.uri != currentUri){
-			MusicList.uri =currentUri;			
-			MusicList.uriFile = currentDirectory;
-			MusicList.clearMusicList();
-		}
+        MusicList.uri =currentUri;
+        MusicList.uriFile = currentDirectory;
+        MusicList.clearMusicList();
 		return MusicList.uri;
 	}
-	protected static Uri setSearchPath(Uri uri){
+	protected static Uri setSearchUri(Uri uri){
 		MusicList.uri =uri;
 		MusicList.uriFile = null;
 		//Log.e("MusicList.uri.toString", MusicList.uri.toString());
@@ -61,15 +54,15 @@ public class MusicList {
         Collections.sort(MusicList.musicList);
 	}
 	public static List<Music> getMusicData(Context context) {
-		if(MusicList.musicList != null) return MusicList.musicList;
+		if(MusicList.musicList != null && !MusicList.musicList.isEmpty()) return MusicList.musicList;
 		else{
 			if(MusicList.uri.equals(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI) || 
 			MusicList.uri.equals(MediaStore.Audio.Media.INTERNAL_CONTENT_URI)){
 				MusicList.musicList = MusicList.getMusicDataFromContentResolver(context);
-                Collections.sort(MusicList.musicList);
+                if(!MusicList.musicList.isEmpty()) Collections.sort(MusicList.musicList);
 			}else{
 				MusicList.musicList = MusicList.getMusicDataFromDir(MusicList.uriFile);
-                Collections.sort(MusicList.musicList);
+                if(!MusicList.musicList.isEmpty()) Collections.sort(MusicList.musicList);
 			}
 		}
 
@@ -88,7 +81,7 @@ public class MusicList {
 					null, null);
 		
 			if (null == cursor) {
-				return null;
+				return musicList;
 			}
 			if (cursor.moveToFirst()) {
 				
