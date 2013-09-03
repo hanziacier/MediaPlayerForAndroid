@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-        <!--最近播放-->
+<!--文件列表,暂未使用-->
 <RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
                  android:layout_width="fill_parent"
                  android:layout_height="fill_parent" >
 
-<LinearLayout android:id="@+id/listMusicLatelyBottom"
+<LinearLayout android:id="@+id/listFolderBottom"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:orientation="horizontal"
               android:layout_alignParentBottom="true"  >
     <include layout="@layout/play_progress" ></include>
 </LinearLayout>
-<LinearLayout  android:id="@+id/listMusicLatelyBody"
+<LinearLayout  android:id="@+id/listFolderBody"
                android:layout_width="fill_parent"
                android:layout_height="wrap_content"
                android:orientation="horizontal"
-               android:layout_above="@id/listMusicLatelyBottom" >
+               android:layout_above="@id/listFolderBottom" >
     <ListView
-            android:id="@+id/listMusicLately"
+            android:id="@+id/listFolder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
