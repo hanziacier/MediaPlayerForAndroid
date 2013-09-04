@@ -30,15 +30,15 @@ public class MusicUtil {
                                     boolean allowdefault//是否使用默认专辑图
     )
     {
-        Bitmap bm;
+        Bitmap bitmap;
         Log.e("MusicUtil","song_id album_id "+song_id+" ,"+album_id);
         if (album_id < 0) {//不存在专辑id时 使用使用插入在音乐文件中的图或者默认专辑图
             // This is something that is not in the database, so get the album art directly
             // from the file.
             if (song_id >= 0) {
-                bm = getArtworkFromFile(context, song_id, -1);
-                if (bm != null) {
-                    return bm;
+                bitmap = getArtworkFromFile(context, song_id, -1);
+                if (bitmap != null) {
+                    return bitmap;
                 }
             }
             if (allowdefault) {
@@ -53,24 +53,24 @@ public class MusicUtil {
             InputStream in = null;
             try {
                 in = res.openInputStream(uri);
-                bm = BitmapFactory.decodeStream(in, null, sBitmapOptions);
-                if(bm !=null) return bm;
+                bitmap = BitmapFactory.decodeStream(in, null, sBitmapOptions);
+                if(bitmap !=null) return bitmap;
                 throw new FileNotFoundException();//抛出错误 进入catch
             } catch (FileNotFoundException ex) {
                 // The album art thumbnail does not actually exist. Maybe the user deleted it, or
                 // maybe it never existed to begin with.
-                bm = getArtworkFromFile(context, song_id, album_id);
-                if (bm != null) {
-                    if (bm.getConfig() == null) {
-                        bm = bm.copy(Bitmap.Config.RGB_565, false);
-                        if (bm == null && allowdefault) {
+                bitmap = getArtworkFromFile(context, song_id, album_id);
+                if (bitmap != null) {
+                    if (bitmap.getConfig() == null) {
+                        bitmap = bitmap.copy(Bitmap.Config.RGB_565, false);
+                        if (bitmap == null && allowdefault) {
                             return getDefaultArtwork(context);
                         }
                     }
                 } else if (allowdefault) {
-                    bm = getDefaultArtwork(context);
+                    bitmap = getDefaultArtwork(context);
                 }
-                return bm;
+                return bitmap;
             } finally {
                 try {
                     if (in != null) {

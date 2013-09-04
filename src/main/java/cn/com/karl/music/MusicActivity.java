@@ -65,7 +65,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	public static Boolean isLoop=false;//是否为单曲循环
 	private SensorManager sensorManager;
 	private boolean mRegisteredSensor;
-    public static Bitmap bm;//当前播放音乐的封面图
+    public static Bitmap bitmap;//当前播放音乐的封面图
     public static Music music;//当前播放的音乐
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -262,10 +262,10 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			replaying=true;
 			currentId = id;//更新当前播放的序列ID
 		}
-        bm = MusicUtil.getArtwork(this, music.getId(), music.getAlbumId(), false);
-        if(bm != null){
+        bitmap = MusicUtil.getArtwork(this, music.getId(), music.getAlbumId(), false);
+        if(bitmap != null){
             Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + music.getId());
-            lrc_view.setBackgroundDrawable(new BitmapDrawable(bm));
+            lrc_view.setBackgroundDrawable(new BitmapDrawable(bitmap));
         }else{
             lrc_view.setBackgroundResource(R.drawable.bg);
         }
