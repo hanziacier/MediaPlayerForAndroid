@@ -43,7 +43,7 @@ public class MusicService extends Service implements Runnable {
 	public LrcView mLrcView;//歌词视图
 	public static Boolean playing = false;
 
-    public Music music=null;
+    public static Music music=null;
 	//---歌词处理----//		
 	private List<LrcContent> lrcList = new ArrayList<LrcContent>();// lrc歌词列表对象	
 	private int lrcListIndex = 0;// 初始化歌词检索值	
@@ -104,7 +104,7 @@ public class MusicService extends Service implements Runnable {
 				player.release();
 				player = null;
 			}
-			playMusic(_id);
+			playMusic(music);
 
 		} else if (play.equals("pause")) {
 			if (null != player) {
@@ -114,18 +114,18 @@ public class MusicService extends Service implements Runnable {
 			if (player != null) {
 				player.start();
 			} else {
-				playMusic(_id);
+				playMusic(music);
 			}
 		} else if (play.equals("replaying")) {
 
 		} else if (play.equals("first")) {
-			playMusic(0);
+			playMusic(MusicList.getMusicList().get(0));
 		} else if (play.equals("rewind")) {
-			playMusic(_id-1);
+			playMusic(MusicList.getMusicList().get(_id-1<0?0:_id-1));
 		} else if (play.equals("forward")) {
-			playMusic(_id+1);
+			playMusic(MusicList.getMusicList().get(_id+1>MusicList.getMusicList().size()-1?MusicList.getMusicList().size()-1:_id+1));
 		} else if (play.equals("last")) {
-			playMusic(MusicList.getMusicList().size()-1);
+			playMusic(MusicList.getMusicList().get(MusicList.getMusicList().size()-1));
 		}
 		// /////////////////////// 初始化歌词配置 /////////////////////// //
 
@@ -147,14 +147,13 @@ public class MusicService extends Service implements Runnable {
 	}
 
 		
-	private void playMusic(int id) {
-		Log.e("MusicService playMusic", "I Get The Id Is "+id);
+	private void playMusic(final Music music) {
+
 		if (null != player) {
 			player.release();
 			player = null;
 		}		
 
-		music = MusicList.getMusicList().get(id);
 		String url = music.getUrl();
 		Uri myUri = Uri.parse(url);
 		player = new MediaPlayer();
@@ -209,7 +208,6 @@ public class MusicService extends Service implements Runnable {
 					player.release();
 					player = null;
 				}
-				music = MusicList.getMusicList().get(_id);
 				String url = music.getUrl();
 				Uri myUri = Uri.parse(url);
 				player = new MediaPlayer();

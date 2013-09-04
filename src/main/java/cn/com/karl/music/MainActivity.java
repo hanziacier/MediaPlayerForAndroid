@@ -39,11 +39,11 @@ public class MainActivity extends TabActivity {
                           res.getDrawable(R.drawable.album))
                       .setContent(intent);
         tabHost.addTab(spec);
-        intent = new Intent().setClass(this, SongsActivity.class);
+/*        intent = new Intent().setClass(this, SeekBarActivity.class);
         spec = tabHost.newTabSpec("最近播放").setIndicator("最近播放",
                           res.getDrawable(R.drawable.album))
                       .setContent(intent);
-        tabHost.addTab(spec);
+        tabHost.addTab(spec);*/
         intent = new Intent().setClass(this, FolderActivity.class);
         spec = tabHost.newTabSpec("目录").setIndicator("目录",
                           res.getDrawable(R.drawable.folder))

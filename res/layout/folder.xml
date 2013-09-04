@@ -4,18 +4,11 @@
                  android:layout_width="fill_parent"
                  android:layout_height="fill_parent" >
 
-<LinearLayout android:id="@+id/listFolderBottom"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:layout_alignParentBottom="true"  >
-    <include layout="@layout/play_progress" ></include>
-</LinearLayout>
 <LinearLayout  android:id="@+id/listFolderBody"
                android:layout_width="fill_parent"
                android:layout_height="wrap_content"
                android:orientation="horizontal"
-               android:layout_above="@id/listFolderBottom" >
+               >
     <ListView
             android:id="@id/android:list"
             android:layout_width="match_parent"
