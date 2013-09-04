@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.os.Parcelable;
 import cn.com.karl.domain.Music;
 import cn.com.karl.util.LrcProcess;
 import cn.com.karl.util.LrcProcess.LrcContent;
@@ -41,7 +42,8 @@ public class MusicService extends Service implements Runnable {
 	public LrcProcess mLrcProcess;//歌词处理类
 	public LrcView mLrcView;//歌词视图
 	public static Boolean playing = false;
-	
+
+    public Music music=null;
 	//---歌词处理----//		
 	private List<LrcContent> lrcList = new ArrayList<LrcContent>();// lrc歌词列表对象	
 	private int lrcListIndex = 0;// 初始化歌词检索值	
@@ -94,8 +96,8 @@ public class MusicService extends Service implements Runnable {
 			_id = 0;
 		}
 		Log.e("MusicService onStartCommand", "_id is"+_id+"");
-		Music m = MusicList.getMusicList().get(_id);
-		String url = m.getUrl();
+		music = MusicList.getMusicList().get(_id);
+		String url = music.getUrl();
 		
 		if (play.equals("play")) {
 			if (null != player) {
@@ -152,8 +154,8 @@ public class MusicService extends Service implements Runnable {
 			player = null;
 		}		
 
-		Music m = MusicList.getMusicList().get(id);
-		String url = m.getUrl();
+		music = MusicList.getMusicList().get(id);
+		String url = music.getUrl();
 		Uri myUri = Uri.parse(url);
 		player = new MediaPlayer();
 		player.reset();
@@ -207,8 +209,8 @@ public class MusicService extends Service implements Runnable {
 					player.release();
 					player = null;
 				}
-				Music m = MusicList.getMusicList().get(_id);
-				String url = m.getUrl();
+				music = MusicList.getMusicList().get(_id);
+				String url = music.getUrl();
 				Uri myUri = Uri.parse(url);
 				player = new MediaPlayer();
 				player.reset();
@@ -260,6 +262,7 @@ public class MusicService extends Service implements Runnable {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
+
 				e.printStackTrace();
 			}
 			try {
@@ -274,6 +277,7 @@ public class MusicService extends Service implements Runnable {
 						Intent intent = new Intent("cn.com.karl.progress");
 						intent.putExtra("position", position);
 						intent.putExtra("total", total);
+                        intent.putExtra("music", (Parcelable) music);
 						sendBroadcast(intent);// 临时屏蔽 调试
 					}
 
@@ -286,6 +290,7 @@ public class MusicService extends Service implements Runnable {
 					}
 				}
 			} catch (Exception e) {
+                //Log.e("MusicService",e.toString());
 				// TODO: handle exception
 			}
 		}

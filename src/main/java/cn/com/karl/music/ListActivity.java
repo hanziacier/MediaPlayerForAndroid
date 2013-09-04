@@ -2,6 +2,8 @@ package cn.com.karl.music;
 
 import java.util.List;
 
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import cn.com.karl.adapter.ListAdapter;
 import cn.com.karl.domain.Music;
 import cn.com.karl.util.MusicList;
@@ -47,4 +49,21 @@ public class ListActivity extends Activity {
 			}
 		});
 	}
+    @Override
+    protected void onStart() {
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)this.findViewById(R.id.listAllMusicBottom).getLayoutParams();
+        if(MusicActivity.music !=null && !MusicActivity.music.getTitle().isEmpty()){//媒体播放器中有音乐时
+            //layoutParams.width = RelativeLayout.LayoutParams.FILL_PARENT;
+            layoutParams.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+            //this.findViewById(R.id.albumListViewBottom).setLayoutParams( new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT));
+            //this.findViewById(R.id.albumListViewBottom).setLayoutParams( layoutParams);
+            ((TextView)this.findViewById(R.id.playMusicName)).setText(MusicActivity.music.getTitle());
+        }else{
+            //layoutParams.width = RelativeLayout.LayoutParams.FILL_PARENT;
+            layoutParams.height = 0;
+            //this.findViewById(R.id.albumListViewBottom).setLayoutParams( new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT,0));
+        }
+        this.findViewById(R.id.listAllMusicBottom).setLayoutParams( layoutParams);
+        super.onStart();
+    }
 }

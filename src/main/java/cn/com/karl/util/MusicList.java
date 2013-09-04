@@ -119,7 +119,7 @@ public class MusicList {
 						m.setTime(time);
 						m.setUrl(url);
 						m.setName(name);
-                        m.setAlbumid(cursor
+                        m.setAlbumId(cursor
                                 .getLong(cursor
                                         .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
                         m.setId(cursor

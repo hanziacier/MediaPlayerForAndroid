@@ -1,6 +1,9 @@
 package cn.com.karl.domain;
 
-public class Music implements Comparable<Music> {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Music implements  Comparable<Music>, Parcelable {
 	private String title="";
 	private String singer;
 	private String album="";
@@ -9,17 +12,30 @@ public class Music implements Comparable<Music> {
 	private long time;
 	private String name;
     private String dirPath="";
-    private long albumid = -1;//媒体库中的专辑id
+    private long albumId = -1;//媒体库中的专辑id
     private long id = -1;//媒体库中的id
 
+    public Music(Parcel parcel) {
+        title = parcel.readString();
+        singer = parcel.readString();
+        album = parcel.readString();
+        url = parcel.readString();
+        size = parcel.readLong();
+        time = parcel.readLong();
+        name = parcel.readString();
+        dirPath = parcel.readString();
+        albumId = parcel.readLong();
+        id = parcel.readLong();
+    }
+    public Music(){}
     public long getId(){
         return id;
     }
-    public long getAlbumid(){
-        return albumid;
+    public long getAlbumId(){
+        return albumId;
     }
-    public void setAlbumid(long albumid){
-        this.albumid = albumid;
+    public void setAlbumId(long albumId){
+        this.albumId = albumId;
     }
     public void setId(long id){
         this.id=id;
@@ -88,5 +104,36 @@ public class Music implements Comparable<Music> {
             return this.title.compareTo(other.getTitle());
         else
             throw new IllegalArgumentException();
+    }
+    public static final Parcelable.Creator<Music> CREATOR  = new Parcelable.Creator<Music>() {
+        public Music createFromParcel(Parcel in) {
+            return new Music(in);
+        }
+
+        @Override
+        public Music[] newArray(int i) {
+            return new Music[0];
+        }
+
+    };
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(title);
+        parcel.writeString(singer);
+        parcel.writeString(album);
+        parcel.writeString(url);
+        parcel.writeLong(size);
+        parcel.writeLong(time);
+        parcel.writeString(name);
+        parcel.writeString(dirPath);
+        parcel.writeLong(albumId);
+        parcel.writeLong(id);
     }
 }

@@ -56,7 +56,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	private int currentVolume;// 当前音量
 	private SeekBar seekBarVolume;
 	private List<Music> lists;
-	private Boolean isPlaying = false;
+	public static Boolean isPlaying = false;
 	private static int id = 1;
 	private static int currentId = MusicList.ErrorID;
 	private static Boolean replaying=false;
@@ -65,7 +65,8 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	public static Boolean isLoop=false;//是否为单曲循环
 	private SensorManager sensorManager;
 	private boolean mRegisteredSensor;
-
+    public static Bitmap bm;//当前播放音乐的封面图
+    public static Music music;//当前播放的音乐
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -223,15 +224,15 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			id = 0;
 		}
 		Log.e("doPlayById", "play id is "+id);
-        Music m = lists.get(id);
+        music = lists.get(id);
 		if (id == currentId) {
-			textName.setText(m.getTitle());
-			textSinger.setText(m.getSinger());
-			textEndTime.setText(toTime((int) m.getTime()));
+			textName.setText(music.getTitle());
+			textSinger.setText(music.getSinger());
+			textEndTime.setText(toTime((int) music.getTime()));
 			Intent intent = new Intent(MusicActivity.this, MusicService.class);
 			intent.putExtra("play", "replaying");
 			intent.putExtra("id", id);
-			intent.putExtra("total", (int) m.getTime());
+			intent.putExtra("total", (int) music.getTime());
 			Log.e("doPlayById", id+"=="+currentId+",now startService doing");
 			startService(intent);
 			if (replaying) {
@@ -247,23 +248,23 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			
 		}else {
 
-			textName.setText(m.getTitle());
-			textSinger.setText(m.getSinger());
-			textEndTime.setText(toTime((int) m.getTime()));		
+			textName.setText(music.getTitle());
+			textSinger.setText(music.getSinger());
+			textEndTime.setText(toTime((int) music.getTime()));		
 			imageBtnPlay.setImageResource(R.drawable.pause1);
 			Intent intent = new Intent(MusicActivity.this, MusicService.class);
 			intent.putExtra("play", "play");
 			intent.putExtra("id", id);
-			intent.putExtra("total", (int) m.getTime());
+			intent.putExtra("total", (int) music.getTime());
 
 			startService(intent);
 			isPlaying = true;
 			replaying=true;
 			currentId = id;//更新当前播放的序列ID
 		}
-        Bitmap bm = MusicUtil.getArtwork(this, m.getId(), m.getAlbumid(),false);
+        bm = MusicUtil.getArtwork(this, music.getId(), music.getAlbumId(), false);
         if(bm != null){
-            Log.e("MusicActivity","I Have Get The Bitmap ,The SongId Is "+m.getId());
+            Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + music.getId());
             lrc_view.setBackgroundDrawable(new BitmapDrawable(bm));
         }else{
             lrc_view.setBackgroundResource(R.drawable.bg);
