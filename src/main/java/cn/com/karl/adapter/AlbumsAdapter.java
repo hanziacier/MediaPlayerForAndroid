@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import cn.com.karl.util.MusicList;
+import cn.com.karl.util.MusicUtil;
 
 public class AlbumsAdapter extends BaseAdapter {
 	
@@ -59,22 +60,8 @@ public class AlbumsAdapter extends BaseAdapter {
 		textMusicSinger.setText(m.getTitle());//歌手的位置显示音乐的名称
 	  
 		TextView textMusicTime=(TextView) convertView.findViewById(R.id.music_item_time);
-		textMusicTime.setText(toTime((int)m.getTime()));
+		textMusicTime.setText(MusicUtil.toTime((int) m.getTime()));
 		return convertView;
 	}
-	  /**
-			 * 时间格式转换
-			 * @param time
-			 * @return
-			 */
-			@SuppressLint("DefaultLocale")
-			public String toTime(int time) {
-		        
-				time /= 1000;
-				int minute = time / 60;
-				//int hour = minute / 60;
-				int second = time % 60;
-				minute %= 60;
-				return String.format("%02d:%02d", minute, second);
-			}
+
 }

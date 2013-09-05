@@ -15,12 +15,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class AlbumsActivity extends SeekBarActivity {
+public class AlbumsActivity extends Activity {
 
 	private ListView albumListView;
-    private PlayProgressBarReciver playProgressBarReciver;
-
-
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -43,25 +40,5 @@ public class AlbumsActivity extends SeekBarActivity {
 			}
 		});
 
-        progressSeekBar.mProgressSeekBar = (SeekBar) this.findViewById(R.id.musicSeekBar);//进度条
-        progressSeekBar.mTitleTextView = (TextView) this.findViewById(R.id.playMusicName);//音乐标题
-        playProgressBarReciver =new PlayProgressBarReciver(this);
-        IntentFilter filter=new IntentFilter("cn.com.karl.progress");
-        this.registerReceiver(playProgressBarReciver, filter);
-
 	}
-/*    @Override
-    protected void onResume() {
-        playProgressBarReciver =new PlayProgressBarReciver();
-        IntentFilter filter=new IntentFilter("cn.com.karl.progress");
-        this.registerReceiver(playProgressBarReciver, filter);
-        super.onResume();
-
-    }*/
-    protected void onDestroy(){
-        this.unregisterReceiver(playProgressBarReciver);
-        super.onDestroy();
-    }
-
-
 }

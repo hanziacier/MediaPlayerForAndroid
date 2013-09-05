@@ -1,21 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
         <!--艺术家-->
-<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
                  android:layout_width="fill_parent"
                  android:layout_height="fill_parent" >
-
-<LinearLayout android:id="@+id/artistListViewBottom"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:layout_alignParentBottom="true"  >
-    <include layout="@layout/play_progress" ></include>
-</LinearLayout>
-<LinearLayout  android:id="@+id/artistListViewBody"
-               android:layout_width="fill_parent"
-               android:layout_height="wrap_content"
-               android:orientation="horizontal"
-               android:layout_above="@id/artistListViewBottom" >
     <ListView
             android:id="@+id/artistListView"
             android:layout_width="match_parent"
@@ -24,4 +11,3 @@
             >
     </ListView>
 </LinearLayout>
-</RelativeLayout>

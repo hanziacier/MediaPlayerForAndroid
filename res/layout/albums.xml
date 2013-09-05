@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
     <!--专辑-->
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent" >
-        <LinearLayout android:id="@+id/albumListViewBottom"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal"
-                      android:layout_alignParentBottom="true"  >
-            <include layout="@layout/play_progress" ></include>
-        </LinearLayout>
-        <LinearLayout  android:id="@+id/albumListViewBody"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal"
-                      android:layout_above="@id/albumListViewBottom" >
-            <ListView
-                    android:id="@+id/albumListView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" >
 
-                    >
-            </ListView>
-        </LinearLayout>
+    <ListView
+            android:id="@+id/albumListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
 
-    </RelativeLayout>
+            >
+    </ListView>
+</LinearLayout>
