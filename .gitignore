@@ -15,9 +15,19 @@ local.properties
 .classpath
 .settings/
 .loadpath
+#################
+## Android Studio
+#################
 .idea/
 out/
 target/
+*.iml
+*.APK
+*.apk
+project.properties
+MediaPlayerForAndroid.iml
+pom.xml
+lint.xml
 # External tool builders
 .externalToolBuilders/
 
