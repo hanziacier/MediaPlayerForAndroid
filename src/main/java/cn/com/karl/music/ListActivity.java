@@ -9,7 +9,6 @@ import android.util.Log;
 import cn.com.karl.adapter.ListAdapter;
 import cn.com.karl.domain.Music;
 import cn.com.karl.domain.ProgressSeekBar;
-import cn.com.karl.receiver.PlayProgressBarReciver;
 import cn.com.karl.util.MusicList;
 
 import android.content.Intent;

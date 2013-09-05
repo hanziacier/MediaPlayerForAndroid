@@ -9,7 +9,7 @@ import android.widget.TextView;
  * Created by leju on 13-9-4.
  */
 public class ProgressSeekBar {
-    public static TextView mEndTime;
+    public static TextView mArtists;
     public static TextView mTitleTextView;
     public static ImageView mImageView;
     public static ImageButton mPlayImageButton;

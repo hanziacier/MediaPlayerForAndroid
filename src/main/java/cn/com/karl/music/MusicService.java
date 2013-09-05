@@ -265,10 +265,12 @@ public class MusicService extends Service implements Runnable {
 			}
 			try {
 				if (null != player) {
-					if (!player.isPlaying()) {// 如果不在播放状态，则停止更新　　
-						// Log.d("player is stoped ","播放器停止播放,跳过获取位置");
-						continue;
-					}
+
+                    if (player.isPlaying()) {
+                        playing = true;
+                    } else {
+                        playing = false;
+                    }
 					int position = player.getCurrentPosition();
 					int total = player.getDuration();
 					if (total > 1) {
@@ -277,16 +279,11 @@ public class MusicService extends Service implements Runnable {
 						intent.putExtra("total", total);
                         intent.putExtra("music", (Parcelable) music);
 						sendBroadcast(intent);// 临时屏蔽 调试
+                        Log.e("MusicService","playStatus "+playing.toString());
 					}
 
 				}
-				if (null != player) {
-					if (player.isPlaying()) {
-						playing = true;
-					} else {
-						playing = false;
-					}
-				}
+
 			} catch (Exception e) {
                 //Log.e("MusicService",e.toString());
 				// TODO: handle exception

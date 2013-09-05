@@ -7,9 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
@@ -21,6 +21,8 @@ public class MainActivity extends TabActivity {
     /** Called when the activity is first created. */
     public static ProgressSeekBar progressSeekBar;
     private PlayProgressBarReciver playProgressBarReciver;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,10 +74,13 @@ public class MainActivity extends TabActivity {
             layoutParams.height = 0;
         }
         this.findViewById(R.id.mainViewBottom).setLayoutParams( layoutParams);
-        progressSeekBar.mEndTime = (TextView) this.findViewById(R.id.playProgessEndTime);//进度条
+        progressSeekBar.mArtists = (TextView) this.findViewById(R.id.playProgessArtists);//艺术家
         progressSeekBar.mTitleTextView = (TextView) this.findViewById(R.id.playProgessName);//音乐标题
         progressSeekBar.mPlayImageButton = (ImageButton) this.findViewById(R.id.playProgessPlay);
         progressSeekBar.mImageView = (ImageView)this.findViewById(R.id.playProgessImage);
+        progressSeekBar.mArtists.setOnClickListener(new MyListener());
+        progressSeekBar.mTitleTextView.setOnClickListener(new MyListener());
+        progressSeekBar.mPlayImageButton.setOnClickListener(new MyListener());
         playProgressBarReciver =new PlayProgressBarReciver();
         IntentFilter filter=new IntentFilter("cn.com.karl.progress");
         this.registerReceiver(playProgressBarReciver, filter);
@@ -83,6 +88,41 @@ public class MainActivity extends TabActivity {
         Log.e("MainActivity", "onResume");
 
     }
+    private class MyListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            if (v == progressSeekBar.mPlayImageButton) {
+                Log.e("MainActivity","MusicService.playStatus "+MusicService.playing.toString()+" MusicService._id "+MusicService._id);
+                // 正在播放
+                if (MusicService.playing == true) {
+                    Intent intent = new Intent(MainActivity.this,
+                            MusicService.class);
+                    intent.putExtra("play", "pause");
+                    intent.putExtra("id", MusicService._id);
+                    startService(intent);
+                    progressSeekBar.mPlayImageButton.setImageResource(R.drawable.play1);
+
+                } else {
+                    Intent intent = new Intent(MainActivity.this,
+                            MusicService.class);
+                    intent.putExtra("play", "playing");
+                    intent.putExtra("id", MusicService._id);
+                    startService(intent);
+                    progressSeekBar.mPlayImageButton.setImageResource(R.drawable.pause1);
+
+                }
+            }else if(v == progressSeekBar.mArtists ||
+                    v == progressSeekBar.mTitleTextView){
+
+                Intent intent = new Intent(MainActivity.this,
+                        MusicActivity.class);
+                intent.putExtra("id", MusicService._id);
+                startActivity(intent);
+            }
+        }
+    }
+
     @Override
     protected void onPause() {
         this.unregisterReceiver(playProgressBarReciver);
@@ -97,12 +137,17 @@ public class MainActivity extends TabActivity {
 
             int position=intent.getIntExtra("position", 0);
             int total=intent.getIntExtra("total", 100);
+
             Music music = (Music) intent.getParcelableExtra("music");
             int progress = position * 100 / total;
             progressSeekBar.mTitleTextView.setText(music.getTitle());
-            progressSeekBar.mEndTime.setText(MusicUtil.toTime((int)music.getTime()));
-            if(MusicActivity.isPlaying)progressSeekBar.mPlayImageButton.setImageResource(R.drawable.pause1);
-            else progressSeekBar.mPlayImageButton.setImageResource(R.drawable.play1);
+            progressSeekBar.mArtists.setText(MusicUtil.toTime((int)music.getTime()));
+            if(MusicService.playing) {
+                progressSeekBar.mPlayImageButton.setImageResource(R.drawable.pause1);
+            }else {
+                progressSeekBar.mPlayImageButton.setImageResource(R.drawable.play1);
+            }
+
             if(false){
 
             }else {
@@ -111,7 +156,7 @@ public class MainActivity extends TabActivity {
                     Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + music.getId());
                     progressSeekBar.mImageView.setImageBitmap(bitmap);
                 }else{
-                    progressSeekBar.mImageView.setImageResource(R.drawable.bg);
+                    progressSeekBar.mImageView.setImageResource(R.drawable.music);
                 }
             }
 

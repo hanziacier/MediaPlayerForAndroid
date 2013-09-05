@@ -267,7 +267,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
             Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + music.getId());
             lrc_view.setBackgroundDrawable(new BitmapDrawable(bitmap));
         }else{
-            lrc_view.setBackgroundResource(R.drawable.bg);
+            lrc_view.setBackgroundResource(R.drawable.listbg);
         }
 
 	}

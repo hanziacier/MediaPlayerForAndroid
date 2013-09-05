@@ -31,7 +31,7 @@ public class MusicUtil {
     )
     {
         Bitmap bitmap;
-        Log.e("MusicUtil","song_id album_id "+song_id+" ,"+album_id);
+
         if (album_id < 0) {//不存在专辑id时 使用使用插入在音乐文件中的图或者默认专辑图
             // This is something that is not in the database, so get the album art directly
             // from the file.
@@ -117,24 +117,24 @@ public class MusicUtil {
     }
 
     private static Bitmap getDefaultArtwork(Context context) {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
+       /* BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inPreferredConfig = Bitmap.Config.RGB_565;
         return BitmapFactory.decodeStream(
-                context.getResources().openRawResource(R.drawable.bg), null, opts);
+                context.getResources().openRawResource(R.drawable.bg), null, opts);*/
+        return null;
     }
 
     /**
-* 时间格式转换
-* @param time
-* @return
-*/
-public static String toTime(int time) {
-
-time /= 1000;
-int minute = time / 60;
-//int hour = minute / 60;
-int second = time % 60;
-//minute %= 60;
-return String.format("%02d:%02d", minute, second);
-}
+    * 时间格式转换
+    * @param time
+    * @return
+    */
+    public static String toTime(int time) {
+        time /= 1000;
+        int minute = time / 60;
+        //int hour = minute / 60;
+        int second = time % 60;
+        //minute %= 60;
+        return String.format("%02d:%02d", minute, second);
+    }
 }

@@ -6,33 +6,14 @@
     <!--播放进度栏-->
     <ImageView android:id="@+id/playProgessImage"
             android:layout_margin="1dp"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_width="48dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/item"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
             />
-
-        <TextView
-                android:id="@+id/playProgessName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="音乐"
-                android:layout_margin="1dp"
-                android:layout_toRightOf="@id/playProgessImage"
-                android:layout_alignParentTop="true"
-                />
-        <TextView
-                android:id="@+id/playProgessEndTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="1dp"
-                android:text="03:20"
-                android:layout_toRightOf="@id/playProgessImage"
-                android:layout_alignTop ="@id/playProgessName"
-                android:layout_alignParentBottom="true"/>
     <ImageButton
             android:id="@+id/playProgessPlay"
             android:layout_width="wrap_content"
@@ -42,5 +23,26 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"/>
+        <TextView
+                android:id="@+id/playProgessName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="音乐"
+                android:layout_margin="1dp"
+                android:layout_toRightOf="@id/playProgessImage"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@id/playProgessPlay"
+                />
+        <TextView
+                android:id="@+id/playProgessArtists"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="1dp"
+                android:text="03:20"
+                android:layout_toRightOf="@id/playProgessImage"
+                android:layout_below ="@id/playProgessName"
+                android:layout_alignParentBottom="true"
+                android:layout_toLeftOf="@id/playProgessPlay"/>
+
 
 </RelativeLayout>

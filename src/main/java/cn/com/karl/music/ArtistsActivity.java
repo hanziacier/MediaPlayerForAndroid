@@ -4,7 +4,6 @@ import android.content.IntentFilter;
 import android.widget.*;
 import cn.com.karl.adapter.ArtistsAdapter;
 import cn.com.karl.domain.ProgressSeekBar;
-import cn.com.karl.receiver.PlayProgressBarReciver;
 import cn.com.karl.util.MusicList;
 import android.app.Activity;
 import android.content.Intent;
