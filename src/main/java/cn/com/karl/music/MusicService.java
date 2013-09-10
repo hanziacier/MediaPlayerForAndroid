@@ -37,7 +37,7 @@ import android.view.animation.AnimationUtils;
 public class MusicService extends Service implements Runnable {
 	private MediaPlayer player;//系统多媒体播放器对象
 
-	public static int _id = 0; // 当前播放在lists中位置
+    public static int _id = 0; // 当前播放在lists中位置
 	public static Boolean isRun = true;
 	public LrcProcess mLrcProcess;//歌词处理类
 	public LrcView mLrcView;//歌词视图

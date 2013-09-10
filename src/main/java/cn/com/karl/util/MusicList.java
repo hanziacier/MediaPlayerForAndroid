@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import java.io.File;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,55 +19,20 @@ import cn.com.karl.filter.MusicFileFilter;
 
 public class MusicList {
 	protected static Uri uri;//音乐检索路径 默认为sd卡
-	protected static File uriFile ;//检索路径，在不使用（无法使用）媒体库查询时使用目录遍历的方式
-	protected static List<Music> musicList;//检索出的音乐列表
-    public final static int ErrorID = -100;
-    public static final String defaultSinger = "未知艺术家";
 	public static Uri setInternalPath(){
         MusicList.setSearchUri(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
-        MusicList.clearMusicList();
 		return MusicList.uri;
 	}
 	public static Uri setExternalPath(){
         MusicList.setSearchUri(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-        MusicList.clearMusicList();
-		return MusicList.uri;
-	}
-	public static Uri setSearchFilePath(File currentDirectory){
-		Uri currentUri = Uri.fromFile(currentDirectory);
-        MusicList.uri =currentUri;
-        MusicList.uriFile = currentDirectory;
-        MusicList.clearMusicList();
 		return MusicList.uri;
 	}
 	protected static Uri setSearchUri(Uri uri){
 		MusicList.uri =uri;
-		MusicList.uriFile = null;
-		//Log.e("MusicList.uri.toString", MusicList.uri.toString());
 		return MusicList.uri;
 	}
-	public static void clearMusicList(){
-		MusicList.musicList=null;
-	}
-	public static void setMusicList(List<Music> list){
-		MusicList.musicList = list;
-        Collections.sort(MusicList.musicList);
-	}
 	public static List<Music> getMusicData(Context context) {
-		if(MusicList.musicList != null && !MusicList.musicList.isEmpty()) return MusicList.musicList;
-		else{
-			if(MusicList.uri.equals(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI) || 
-			MusicList.uri.equals(MediaStore.Audio.Media.INTERNAL_CONTENT_URI)){
-				MusicList.musicList = MusicList.getMusicDataFromContentResolver(context);
-                if(!MusicList.musicList.isEmpty()) Collections.sort(MusicList.musicList);
-			}else{
-				MusicList.musicList = MusicList.getMusicDataFromDir(MusicList.uriFile);
-                if(!MusicList.musicList.isEmpty()) Collections.sort(MusicList.musicList);
-			}
-		}
-
-		return MusicList.musicList;
-
+        return MusicList.getMusicDataFromContentResolver(context);
 	}
 	protected static List<Music> getMusicDataFromContentResolver(Context context){
 		List<Music> musicList = new ArrayList<Music>();
@@ -92,10 +57,6 @@ public class MusicList {
 							.getColumnIndex(MediaStore.Audio.Media.TITLE));
 					String singer = cursor.getString(cursor
 							.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-
-					if ("<unknown>".equals(singer)) {
-						singer = MusicList.defaultSinger;
-					}
 					String album = cursor.getString(cursor
 							.getColumnIndex(MediaStore.Audio.Media.ALBUM));
 					long size = cursor.getLong(cursor
@@ -107,10 +68,6 @@ public class MusicList {
 					String name = cursor
 							.getString(cursor
 									.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-					if((name == null || name.length() < 4) ) {
-						if( cursor.moveToNext()) continue;
-						else break;
-					}
 					if (new MusicFileFilter().accept(name) ) {
 						m.setTitle(title);
 						m.setSinger(singer);
@@ -130,60 +87,8 @@ public class MusicList {
 				} while (cursor.moveToNext());
 			}
 		}
+        Collections.sort(musicList);
 		return musicList;	
 	}
-	protected static List<Music> getMusicDataFromDir(File dir){
-		List<Music> musicList = new ArrayList<Music>();
-		File[] files = dir.listFiles(new MusicFileFilter());
-		Log.e("MusicList.getMusicDataFromDirUri.dir", dir.toString());
-		Log.e("MusicList.getMusicDataFromDirUri.files", files.toString());
-		if(files != null){
-			for (File currentFile : files)
-			{
-				//判断是一个文件夹还是一个文件
-				if (currentFile.isDirectory())
-				{
-					//currentIcon = getResources().getDrawable(R.drawable.folder);
-					continue;
-				}
-				else
-				{
-					//取得文件名
-					String fileName = currentFile.getName();
 
-                    Music m = new Music();
-                    m.setTitle(fileName);
-                    m.setSinger(MusicList.defaultSinger);
-                    m.setDirPath(dir.toString());
-                    //m.setAlbum(album);
-                    //m.setSize(size);
-                    //m.setTime(time);
-                    m.setUrl(currentFile.getAbsolutePath());
-                    //m.setName(name);
-                    musicList.add(m);
-                    Log.e("MusicList.getMusicDataFromDirUri.music",m.getUrl().toString());
-
-					
-				}
-				
-			}
-		}		
-		return musicList;
-	}
-	public static int getIndex(File file){
-
-		if(MusicList.musicList.isEmpty()) return MusicList.ErrorID;
-		int i=0;
-		for(Music m:MusicList.musicList){
-			if(m.getUrl().equals(file.getAbsolutePath())){
-				return i;
-			}
-			i++;
-		}
-		return MusicList.ErrorID;
-	}
-    public static List<Music> getMusicList(){
-        return MusicList.musicList;
-
-    }
 }

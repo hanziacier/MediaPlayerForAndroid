@@ -14,13 +14,16 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.*;
 import cn.com.karl.domain.Music;
+import cn.com.karl.domain.Playbox;
 import cn.com.karl.domain.ProgressSeekBar;
+import cn.com.karl.util.MusicList;
 import cn.com.karl.util.MusicUtil;
 
 public class MainActivity extends TabActivity {
     /** Called when the activity is first created. */
     public static ProgressSeekBar progressSeekBar;
     private PlayProgressBarReciver playProgressBarReciver;
+    private TTMdeiaPlayer app;
 
 
     @Override
@@ -30,7 +33,7 @@ public class MainActivity extends TabActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.main);
-        
+        app = (TTMdeiaPlayer)getApplication();
         Resources res = getResources(); 
         TabHost tabHost = getTabHost(); 
         TabHost.TabSpec spec; 
@@ -52,11 +55,7 @@ public class MainActivity extends TabActivity {
                           res.getDrawable(R.drawable.album))
                       .setContent(intent);
         tabHost.addTab(spec);
-/*        intent = new Intent().setClass(this, SeekBarActivity.class);
-        spec = tabHost.newTabSpec("最近播放").setIndicator("最近播放",
-                          res.getDrawable(R.drawable.album))
-                      .setContent(intent);
-        tabHost.addTab(spec);*/
+
         intent = new Intent().setClass(this, FolderActivity.class);
         spec = tabHost.newTabSpec("目录").setIndicator("目录",
                           res.getDrawable(R.drawable.folder))
@@ -67,9 +66,9 @@ public class MainActivity extends TabActivity {
     }
     protected void onResume() {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)this.findViewById(R.id.mainViewBottom).getLayoutParams();
-        if(MusicActivity.music !=null && MusicActivity.music.getTitle()!=""){//媒体播放器中有音乐时
+        if(Playbox.getPlaybox().getCurrentMusic() != null ){//媒体播放器中有音乐时
             layoutParams.height = TabHost.LayoutParams.WRAP_CONTENT;
-            ((TextView)this.findViewById(R.id.playProgessName)).setText(MusicActivity.music.getTitle());
+            ((TextView)this.findViewById(R.id.playProgessName)).setText(Playbox.getPlaybox().getCurrentMusic().getTitle());
         }else{
             layoutParams.height = 0;
         }
@@ -93,13 +92,13 @@ public class MainActivity extends TabActivity {
         @Override
         public void onClick(View v) {
             if (v == progressSeekBar.mPlayImageButton) {
-                Log.e("MainActivity","MusicService.playStatus "+MusicService.playing.toString()+" MusicService._id "+MusicService._id);
+                //Log.e("MainActivity","MusicService.playStatus "+MusicService.playing.toString()+" MusicService._id "+MusicService._id);
                 // 正在播放
-                if (MusicService.playing == true) {
+                if (app.playbox.isPlaying() == true) {
                     Intent intent = new Intent(MainActivity.this,
                             MusicService.class);
                     intent.putExtra("play", "pause");
-                    intent.putExtra("id", MusicService._id);
+                    intent.putExtra("id", app.playbox.getCurrentPlayListId());
                     startService(intent);
                     progressSeekBar.mPlayImageButton.setImageResource(R.drawable.play1);
 
@@ -107,7 +106,7 @@ public class MainActivity extends TabActivity {
                     Intent intent = new Intent(MainActivity.this,
                             MusicService.class);
                     intent.putExtra("play", "playing");
-                    intent.putExtra("id", MusicService._id);
+                    intent.putExtra("id", app.playbox.getCurrentPlayListId());
                     startService(intent);
                     progressSeekBar.mPlayImageButton.setImageResource(R.drawable.pause1);
 
@@ -117,7 +116,7 @@ public class MainActivity extends TabActivity {
 
                 Intent intent = new Intent(MainActivity.this,
                         MusicActivity.class);
-                intent.putExtra("id", MusicService._id);
+                intent.putExtra("id", app.playbox.getCurrentPlayListId());
                 startActivity(intent);
             }
         }

@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.util.Log;
 import cn.com.karl.adapter.ListAdapter;
 import cn.com.karl.domain.Music;
+import cn.com.karl.domain.Playbox;
 import cn.com.karl.domain.ProgressSeekBar;
 import cn.com.karl.util.MusicList;
 
@@ -30,9 +31,9 @@ public class ListActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.listmusic);
-		
+
 		this.listView= (ListView) this.findViewById(R.id.listAllMusic);
-        MusicList.setExternalPath();
+
 		List<Music> listMusic=MusicList.getMusicData(this);
 		ListAdapter adapter=new ListAdapter(this, listMusic);
 		this.listView.setAdapter(adapter);

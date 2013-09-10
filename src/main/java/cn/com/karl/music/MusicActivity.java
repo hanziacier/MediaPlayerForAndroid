@@ -36,7 +36,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import cn.com.karl.util.MusicUtil;
 
 public class MusicActivity extends Activity implements SensorEventListener{
-
+    private TTMdeiaPlayer app;
 	private TextView textName;
 	private TextView textSinger;
 	private TextView textStartTime;
@@ -58,7 +58,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	private List<Music> lists;
 	public static Boolean isPlaying = false;
 	private static int id = 1;
-	private static int currentId = MusicList.ErrorID;
+	private static int currentId = -1;
 	private static Boolean replaying=false;
 	private MyProgressBroadCastReceiver receiver;
 	private MyCompletionListner completionListner;
@@ -75,7 +75,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.music);
-
+        app = (TTMdeiaPlayer)getApplication();//获得applicaiton的全局引用
 		textName = (TextView) this.findViewById(R.id.music_name);
 		textSinger = (TextView) this.findViewById(R.id.music_singer);
 		textStartTime = (TextView) this.findViewById(R.id.music_start_time);
@@ -102,7 +102,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		imageBtnRandom.setOnClickListener(new MyListener());
 		//sensorManager=(SensorManager) getSystemService(SENSOR_SERVICE);
 
-		lists = MusicList.getMusicData(this);
+
 		audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);// 获得最大音量
 		currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);// 获得当前音量
@@ -209,10 +209,11 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
+        lists = app.playbox.getPlayList();
 		receiver=new MyProgressBroadCastReceiver();
 		IntentFilter filter=new IntentFilter("cn.com.karl.progress");
 		this.registerReceiver(receiver, filter);		
-		id = getIntent().getIntExtra("id", 1);
+		id = getIntent().getIntExtra("id", 0);
 		doPlayById(id);
 		
 	}
