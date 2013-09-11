@@ -52,7 +52,7 @@ public class FolderActivity extends ListActivity
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent intent = new Intent();
                                 intent.setAction(android.content.Intent.ACTION_VIEW);
-                                MusicList.setSearchFilePath(clickedFile);
+                                //MusicList.setSearchFilePath(clickedFile);
                                 MusicList.getMusicData(FolderActivity.this);
                                 intent.setClass(FolderActivity.this, MusicActivity.class);
                                 intent.putExtra("id", 0);
@@ -114,12 +114,13 @@ public class FolderActivity extends ListActivity
 		// 取得文件名
 		String fileName = file.getName();
 		// 根据不同的文件类型来打开文件
-        MusicList.setSearchFilePath(this.currentDirectory);
+        //MusicList.setSearchFilePath(this.currentDirectory);
         MusicList.getMusicData(this);
         Intent intent = new Intent();
         intent.setAction(android.content.Intent.ACTION_VIEW);
         intent.setClass(this, MusicActivity.class);
-		int id = MusicList.getIndex(file);
+		//int id = MusicList.getIndex(file);
+        int id=0;
 		if(id>=0){
 			intent.putExtra("id", id);
 			startActivity(intent);

@@ -2,20 +2,21 @@ package cn.com.karl.music;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import android.content.*;
+import android.database.Cursor;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 import cn.com.karl.domain.Music;
+import cn.com.karl.filter.MusicFileFilter;
 import cn.com.karl.util.LrcProcess;
 import cn.com.karl.util.LrcProcess.LrcContent;
 import cn.com.karl.util.LrcView;
 import cn.com.karl.util.MusicList;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 //import android.hardware.Sensor;
 //import android.hardware.SensorEvent;
 //import android.hardware.SensorEventListener;
@@ -35,31 +36,29 @@ import android.util.Log;
 import android.view.animation.AnimationUtils;
 
 public class MusicService extends Service implements Runnable {
+    public final static String TEMP_PLAY_LIST_NAME = "TTMediaPlayLists_Temp";//临时播放列表
+    public final static String FAVORITE_PLAY_LIST_NAME = "TTMediaPlayLists_Favorite";//最喜爱的播放列表
+    private int TTMediaPlayLists_Temp_Id;//临时播放列表的ID
+    private int TTMediaPlayLists_Favorite_Id;//最喜爱的播放列表的ID
+    private  int sleepTime=0;
+    private int maxSleepTime=10*60*1000; //最大静置时间，十分钟 之后退出service
+
 	private MediaPlayer player;//系统多媒体播放器对象
 
     public static int _id = 0; // 当前播放在lists中位置
 	public static Boolean isRun = true;
-	public LrcProcess mLrcProcess;//歌词处理类
-	public LrcView mLrcView;//歌词视图
-	public static Boolean playing = false;
-
+	public static Boolean playing = false;//是否正在播放
+    public List<Music> musicList;//播放音乐列表
+    public static boolean isLoop=false;
     public static Music music=null;
-	//---歌词处理----//		
+	//---歌词处理----//
+    public LrcProcess mLrcProcess;//歌词处理类
 	private List<LrcContent> lrcList = new ArrayList<LrcContent>();// lrc歌词列表对象	
 	private int lrcListIndex = 0;// 初始化歌词检索值	
 	private int CurrentTime = 0;// 初始化歌曲播放时间的变量	
 	private int CountTime = 0;	// 初始化歌曲总时间的变量
-	Handler mHandler = new Handler();
-	// 歌词滚动线程
-	Runnable mRunnable = new Runnable() {//匿名内部类
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub 测试屏蔽
-			MusicActivity.lrc_view.SetIndex(LrcIndex());
-			MusicActivity.lrc_view.invalidate();
-			mHandler.postDelayed(mRunnable, 200);
-		}
-	};
+
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -75,11 +74,26 @@ public class MusicService extends Service implements Runnable {
 		this.registerReceiver(receiver, filter);
 		new Thread(this).start();//开启新的线程执行run方法
 		super.onCreate();
+        ContentResolver cr = getContentResolver();
+        Cursor cursor = cr.query(
+                MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI, null, null,
+                null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(cursor
+                        .getColumnIndex(MediaStore.Audio.PlaylistsColumns.NAME));
+                if(MusicService.TEMP_PLAY_LIST_NAME.equals(name)){//设置临时播放列表的id号
+                    TTMediaPlayLists_Temp_Id=cursor.getInt(cursor
+                            .getColumnIndex(MediaStore.Audio.Playlists.Members._ID));
+                    break;
+                }
+            }while (cursor.moveToNext());
+        }
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
-		
+
 		// TODO Auto-generated method stub
 
 		if(intent==null){
@@ -87,16 +101,16 @@ public class MusicService extends Service implements Runnable {
             return super.onStartCommand(intent, flags, startId)	;
 
 		}
-
+        musicList = getTempPlayList();
 		String play = intent.getStringExtra("play");
 		_id = intent.getIntExtra("id", 1);
-		if (_id > MusicList.getMusicList().size() - 1) {
-			_id = MusicList.getMusicList().size() - 1;
+		if (_id > musicList.size() - 1) {
+			_id = musicList.size() - 1;
 		} else if (_id < 0) {
 			_id = 0;
 		}
 		Log.e("MusicService onStartCommand", "_id is"+_id+"");
-		music = MusicList.getMusicList().get(_id);
+		music = musicList.get(_id);
 		String url = music.getUrl();
 		
 		if (play.equals("play")) {
@@ -119,30 +133,15 @@ public class MusicService extends Service implements Runnable {
 		} else if (play.equals("replaying")) {
 
 		} else if (play.equals("first")) {
-			playMusic(MusicList.getMusicList().get(0));
+			playMusic(musicList.get(0));
 		} else if (play.equals("rewind")) {
-			playMusic(MusicList.getMusicList().get(_id-1<0?0:_id-1));
+			playMusic(musicList.get(_id-1<0?0:_id-1));
 		} else if (play.equals("forward")) {
-			playMusic(MusicList.getMusicList().get(_id+1>MusicList.getMusicList().size()-1?MusicList.getMusicList().size()-1:_id+1));
+			playMusic(musicList.get(_id+1>musicList.size()-1?musicList.size()-1:_id+1));
 		} else if (play.equals("last")) {
-			playMusic(MusicList.getMusicList().get(MusicList.getMusicList().size()-1));
+			playMusic(musicList.get(musicList.size()-1));
 		}
-		// /////////////////////// 初始化歌词配置 /////////////////////// //
-
-		mLrcProcess = new LrcProcess();		
-		// 读取歌词文件
-		mLrcProcess.readLRC(url);
-		// 传回处理后的歌词文件
-		lrcList = mLrcProcess.getLrcContent();
-		MusicActivity.lrc_view.setSentenceEntities(lrcList);
-		// 切换带动画显示歌词
-		MusicActivity.lrc_view.setAnimation(AnimationUtils.loadAnimation(	MusicService.this, R.anim.alpha_z));
-		// 启动线程
-		mHandler.post(mRunnable);
-
-		// /////////////////////// 初始化歌词配置 /////////////////////// //
-		int returnInt = super.onStartCommand(intent, flags, startId)	;
-		return returnInt;
+		return super.onStartCommand(intent, flags, startId)	;
 
 	}
 
@@ -184,7 +183,7 @@ public class MusicService extends Service implements Runnable {
 			public void onCompletion(MediaPlayer mp) {
 				// TODO Auto-generated method stub
 				// 下一首
-				if (MusicActivity.isLoop == false) {
+				if (isLoop == false) {
 					player.reset();
 					Intent intent = new Intent("cn.com.karl.completion");					
 					_id = _id + 1;
@@ -241,7 +240,6 @@ public class MusicService extends Service implements Runnable {
 
 	//进度条广播接受器（接受进度条变化的广播，依据：注册接收器的过滤器指定）
 	private class SeekBarBroadcastReceiver extends BroadcastReceiver {
-
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
@@ -268,8 +266,10 @@ public class MusicService extends Service implements Runnable {
 
                     if (player.isPlaying()) {
                         playing = true;
+                        sleepTime = 0;
                     } else {
                         playing = false;
+                        sleepTime += 200;
                     }
 					int position = player.getCurrentPosition();
 					int total = player.getDuration();
@@ -282,9 +282,12 @@ public class MusicService extends Service implements Runnable {
                         Log.e("MusicService","playStatus "+playing.toString());
 					}
 
-				}
+				}else{
+                    sleepTime += 200;
+                }
 
 			} catch (Exception e) {
+                sleepTime += 200;
                 //Log.e("MusicService",e.toString());
 				// TODO: handle exception
 			}
@@ -324,5 +327,61 @@ public class MusicService extends Service implements Runnable {
 		}
 		return lrcListIndex;
 	}
+    public List<Music> getTempPlayList(){
+        List<Music> musicList = null;
+        ContentResolver cr = getContentResolver();
+        if (cr != null) {
+            Cursor cursor = cr.query(
+                    MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI,
+                    null,
+                    MediaStore.Audio.Playlists.Members.PLAYLIST_ID+"="+TTMediaPlayLists_Temp_Id,
+                    null,
+                    null);
 
+            if (null == cursor) {
+                return null;
+            }
+            if (cursor.moveToFirst()) {
+                do {
+                    Music m = new Music();
+                    Log.e("MusicList.cursor", cursor.toString());
+                    String title = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.TITLE));
+                    String singer = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                    String album = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.ALBUM));
+                    long size = cursor.getLong(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.SIZE));
+                    long time = cursor.getLong(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.DURATION));
+                    String url = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.DATA));
+                    String name = cursor
+                            .getString(cursor
+                                    .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+                    if (new MusicFileFilter().accept(name) ) {
+                        m.setTitle(title);
+                        m.setSinger(singer);
+                        m.setAlbum(album);
+                        m.setSize(size);
+                        m.setTime(time);
+                        m.setUrl(url);
+                        m.setName(name);
+                        m.setAlbumId(cursor
+                                .getLong(cursor
+                                        .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
+                        m.setId(cursor
+                                .getLong(cursor
+                                        .getColumnIndex(MediaStore.Audio.Media._ID)));
+                        musicList.add(m);
+                    }
+                }while (cursor.moveToNext());
+            }
+        }else{
+            return null;
+        }
+        Collections.sort(musicList);
+        return musicList;
+    }
 }
