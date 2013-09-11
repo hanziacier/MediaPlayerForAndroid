@@ -25,17 +25,17 @@ import android.widget.TextView;
 public class ListActivity extends Activity {
 
 	private ListView listView;
+    private TTMdeiaPlayer app;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.listmusic);
-
+        app = (TTMdeiaPlayer)getApplication();
 		this.listView= (ListView) this.findViewById(R.id.listAllMusic);
 
-		List<Music> listMusic=MusicList.getMusicData(this);
-		ListAdapter adapter=new ListAdapter(this, listMusic);
+		ListAdapter adapter=new ListAdapter(this, app.musicList);
 		this.listView.setAdapter(adapter);
 		this.listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -47,6 +47,7 @@ public class ListActivity extends Activity {
 			        // 点击的是headerView或者footerView  
 			        return;  
 			    }
+                app.playbox.setPlayList(app.musicList);//设定临时播放列表
 				Intent intent = new Intent(ListActivity.this,
 						MusicActivity.class);
 				intent.putExtra("id", position);

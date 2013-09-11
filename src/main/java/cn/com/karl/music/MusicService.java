@@ -84,7 +84,7 @@ public class MusicService extends Service implements Runnable {
                         .getColumnIndex(MediaStore.Audio.PlaylistsColumns.NAME));
                 if(MusicService.TEMP_PLAY_LIST_NAME.equals(name)){//设置临时播放列表的id号
                     TTMediaPlayLists_Temp_Id=cursor.getInt(cursor
-                            .getColumnIndex(MediaStore.Audio.Playlists.Members._ID));
+                            .getColumnIndex(MediaStore.Audio.Playlists._ID));
                     break;
                 }
             }while (cursor.moveToNext());

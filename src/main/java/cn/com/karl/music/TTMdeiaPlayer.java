@@ -2,8 +2,10 @@ package cn.com.karl.music;
 
 import android.app.Application;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore;
 import cn.com.karl.domain.Music;
 import cn.com.karl.domain.Playbox;
@@ -15,8 +17,10 @@ import java.util.List;
  * Created by leju on 13-9-6.
  */
 public class TTMdeiaPlayer extends Application {
-    public List<Music> musicList;
-    public Playbox playbox;
+    public List<Music> musicList=null;//当前界面下的音乐列表
+    public Playbox playbox=null;
+    public long tempPlayListId = -1;
+    public long favoritePlayListId = -1;
     private static TTMdeiaPlayer instance;
 
     public static TTMdeiaPlayer getInstance() {
@@ -36,8 +40,16 @@ public class TTMdeiaPlayer extends Application {
                 do {
                     String name = cursor.getString(cursor
                             .getColumnIndex(MediaStore.Audio.PlaylistsColumns.NAME));
-                    if(MusicService.TEMP_PLAY_LIST_NAME.equals(name)) needCreateTempPlayList=false;
-                    if(MusicService.FAVORITE_PLAY_LIST_NAME.equals(name)) needCreateTempPlayList=false;
+                    if(MusicService.TEMP_PLAY_LIST_NAME.equals(name)) {
+                        needCreateTempPlayList=false;
+                        tempPlayListId = cursor.getLong(cursor
+                                .getColumnIndex(MediaStore.Audio.Playlists._ID));
+                    }
+                    if(MusicService.FAVORITE_PLAY_LIST_NAME.equals(name)) {
+                        needCreateFavoritePlayList=false;
+                        favoritePlayListId = cursor.getLong(cursor
+                                .getColumnIndex(MediaStore.Audio.Playlists._ID));
+                    }
 
 
                 }while (cursor.moveToNext());
@@ -45,18 +57,20 @@ public class TTMdeiaPlayer extends Application {
             if(needCreateTempPlayList){//创建临时播放列表
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Audio.PlaylistsColumns.NAME,MusicService.TEMP_PLAY_LIST_NAME);
-                cr.insert( MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI,contentValues );
+                Uri uri = cr.insert( MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI,contentValues );
+                tempPlayListId = ContentUris.parseId(uri);
             }
             if(needCreateFavoritePlayList){//创建最爱播放列表
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Audio.PlaylistsColumns.NAME,MusicService.FAVORITE_PLAY_LIST_NAME);
-                cr.insert( MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI,contentValues );
+                Uri uri = cr.insert( MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI,contentValues );
+                favoritePlayListId = ContentUris.parseId(uri);
             }
         }
         MusicList.setExternalPath();
         musicList = MusicList.getMusicData(this);
         playbox = Playbox.getPlaybox();
-        playbox.setPlayList(musicList);//设置播放盒子的播放列表
+
     }
 
 }

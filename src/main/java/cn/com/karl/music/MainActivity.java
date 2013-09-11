@@ -16,11 +16,9 @@ import android.widget.*;
 import cn.com.karl.domain.Music;
 import cn.com.karl.domain.Playbox;
 import cn.com.karl.domain.ProgressSeekBar;
-import cn.com.karl.util.MusicList;
 import cn.com.karl.util.MusicUtil;
 
 public class MainActivity extends TabActivity {
-    /** Called when the activity is first created. */
     public static ProgressSeekBar progressSeekBar;
     private PlayProgressBarReciver playProgressBarReciver;
     private TTMdeiaPlayer app;
@@ -150,7 +148,7 @@ public class MainActivity extends TabActivity {
             if(false){
 
             }else {
-                Bitmap bitmap = MusicUtil.getArtwork(context, music.getId(), music.getAlbumId(), false);
+                Bitmap bitmap = ((TTMdeiaPlayer)getApplication()).playbox.currentMusicBitmap;
                 if(bitmap != null){
                     Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + music.getId());
                     progressSeekBar.mImageView.setImageBitmap(bitmap);
