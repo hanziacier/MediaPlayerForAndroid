@@ -22,7 +22,7 @@ public class MainActivity extends TabActivity {
     public static ProgressSeekBar progressSeekBar;
     private PlayProgressBarReciver playProgressBarReciver;
     private TTMdeiaPlayer app;
-
+    private Playbox playbox;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,6 +32,7 @@ public class MainActivity extends TabActivity {
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.main);
         app = (TTMdeiaPlayer)getApplication();
+        playbox = app.playbox;
         Resources res = getResources(); 
         TabHost tabHost = getTabHost(); 
         TabHost.TabSpec spec; 
@@ -144,18 +145,13 @@ public class MainActivity extends TabActivity {
             }else {
                 progressSeekBar.mPlayImageButton.setImageResource(R.drawable.play1);
             }
-
-            if(false){
-
-            }else {
-                Bitmap bitmap = ((TTMdeiaPlayer)getApplication()).playbox.currentMusicBitmap;
-                if(bitmap != null){
-                    Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + music.getId());
-                    progressSeekBar.mImageView.setImageBitmap(bitmap);
-                }else{
-                    progressSeekBar.mImageView.setImageResource(R.drawable.music);
-                }
+            Bitmap bitmap = playbox.currentMusicBitmap;
+            if(bitmap != null){
+                progressSeekBar.mImageView.setImageBitmap(bitmap);
+            }else{
+                progressSeekBar.mImageView.setImageResource(R.drawable.music);
             }
+
 
         }
     }

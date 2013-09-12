@@ -59,6 +59,7 @@ public class MusicService extends Service implements Runnable {
 	private int CurrentTime = 0;// 初始化歌曲播放时间的变量	
 	private int CountTime = 0;	// 初始化歌曲总时间的变量
 
+    private SeekBarBroadcastReceiver seekBarBroadcastReceiver;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -70,9 +71,9 @@ public class MusicService extends Service implements Runnable {
 	public void onCreate() {
 		// TODO Auto-generated method stub
 
-		SeekBarBroadcastReceiver receiver = new SeekBarBroadcastReceiver();
+        seekBarBroadcastReceiver = new SeekBarBroadcastReceiver();
 		IntentFilter filter = new IntentFilter("cn.com.karl.seekBar");
-		this.registerReceiver(receiver, filter);
+		this.registerReceiver(seekBarBroadcastReceiver, filter);
 		new Thread(this).start();//开启新的线程执行run方法
 		super.onCreate();
         ContentResolver cr = getContentResolver();
@@ -136,17 +137,16 @@ public class MusicService extends Service implements Runnable {
 		} else if (play.equals("first")) {
 			playMusic(musicList.get(0));
 		} else if (play.equals("rewind")) {
-			playMusic(musicList.get(_id-1<0?0:_id-1));
+			playMusic(musicList.get(_id - 1 < 0 ? 0 : _id - 1));
 		} else if (play.equals("forward")) {
-			playMusic(musicList.get(_id+1>musicList.size()-1?musicList.size()-1:_id+1));
+			playMusic(musicList.get(_id + 1 > musicList.size() - 1 ? musicList.size() - 1 : _id + 1));
 		} else if (play.equals("last")) {
-			playMusic(musicList.get(musicList.size()-1));
+			playMusic(musicList.get(musicList.size() - 1));
 		}
 		return super.onStartCommand(intent, flags, startId)	;
 
 	}
 
-		
 	private void playMusic(final Music music) {
 
 		if (null != player) {
@@ -299,7 +299,13 @@ public class MusicService extends Service implements Runnable {
         //stopSelf();
 	}
 
-	/**
+    @Override
+    public void onDestroy() {
+        this.unregisterReceiver(seekBarBroadcastReceiver);
+        super.onDestroy();
+    }
+
+    /**
 	 * 歌词同步处理类
 	 */
 	public int LrcIndex() {//返回当前播放的音乐在lrcList中的位置
