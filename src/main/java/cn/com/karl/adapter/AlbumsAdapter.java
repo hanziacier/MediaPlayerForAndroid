@@ -54,7 +54,7 @@ public class AlbumsAdapter extends BaseAdapter {
 		Music m=listMusic.get(position);
 		//音乐名
 		TextView textMusicName=(TextView) convertView.findViewById(R.id.music_item_name);
-		textMusicName.setText(m.getSinger().compareTo(MusicList.defaultSinger) == 0 ? m.getAlbum() : m.getSinger());//音乐的位置先收歌手的名字
+		textMusicName.setText(m.getSinger());//音乐的位置先收歌手的名字
 		//歌手
 		TextView textMusicSinger=(TextView) convertView.findViewById(R.id.music_item_singer);
 		textMusicSinger.setText(m.getTitle());//歌手的位置显示音乐的名称

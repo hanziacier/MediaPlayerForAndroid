@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import cn.com.karl.domain.Music;
+import cn.com.karl.domain.Playbox;
 import cn.com.karl.filter.MusicFileFilter;
 import cn.com.karl.util.LrcProcess;
 import cn.com.karl.util.LrcProcess.LrcContent;
@@ -41,11 +42,11 @@ public class MusicService extends Service implements Runnable {
     private int TTMediaPlayLists_Temp_Id;//临时播放列表的ID
     private int TTMediaPlayLists_Favorite_Id;//最喜爱的播放列表的ID
     private  int sleepTime=0;
-    private int maxSleepTime=10*60*1000; //最大静置时间，十分钟 之后退出service
+    private int maxSleepTime=60*1000; //最大静置时间，十分钟 之后退出service
 
 	private MediaPlayer player;//系统多媒体播放器对象
 
-    public static int _id = 0; // 当前播放在lists中位置
+    public static int _id = -1; // 当前播放在lists中位置
 	public static Boolean isRun = true;
 	public static Boolean playing = false;//是否正在播放
     public List<Music> musicList;//播放音乐列表
@@ -76,7 +77,7 @@ public class MusicService extends Service implements Runnable {
 		super.onCreate();
         ContentResolver cr = getContentResolver();
         Cursor cursor = cr.query(
-                MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI, null, null,
+                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, null, null,
                 null, null);
         if (cursor.moveToFirst()) {
             do {
@@ -101,7 +102,7 @@ public class MusicService extends Service implements Runnable {
             return super.onStartCommand(intent, flags, startId)	;
 
 		}
-        musicList = getTempPlayList();
+        musicList = Playbox.getPlaybox().getAudioPlayLists(getContentResolver(),TTMediaPlayLists_Temp_Id);
 		String play = intent.getStringExtra("play");
 		_id = intent.getIntExtra("id", 1);
 		if (_id > musicList.size() - 1) {
@@ -291,7 +292,11 @@ public class MusicService extends Service implements Runnable {
                 //Log.e("MusicService",e.toString());
 				// TODO: handle exception
 			}
+            if(sleepTime>= maxSleepTime){
+                break;
+            }
 		}
+        stopSelf();
 	}
 
 	/**
@@ -327,61 +332,5 @@ public class MusicService extends Service implements Runnable {
 		}
 		return lrcListIndex;
 	}
-    public List<Music> getTempPlayList(){
-        List<Music> musicList = null;
-        ContentResolver cr = getContentResolver();
-        if (cr != null) {
-            Cursor cursor = cr.query(
-                    MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI,
-                    null,
-                    MediaStore.Audio.Playlists.Members.PLAYLIST_ID+"="+TTMediaPlayLists_Temp_Id,
-                    null,
-                    null);
 
-            if (null == cursor) {
-                return null;
-            }
-            if (cursor.moveToFirst()) {
-                do {
-                    Music m = new Music();
-                    Log.e("MusicList.cursor", cursor.toString());
-                    String title = cursor.getString(cursor
-                            .getColumnIndex(MediaStore.Audio.Media.TITLE));
-                    String singer = cursor.getString(cursor
-                            .getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                    String album = cursor.getString(cursor
-                            .getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                    long size = cursor.getLong(cursor
-                            .getColumnIndex(MediaStore.Audio.Media.SIZE));
-                    long time = cursor.getLong(cursor
-                            .getColumnIndex(MediaStore.Audio.Media.DURATION));
-                    String url = cursor.getString(cursor
-                            .getColumnIndex(MediaStore.Audio.Media.DATA));
-                    String name = cursor
-                            .getString(cursor
-                                    .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-                    if (new MusicFileFilter().accept(name) ) {
-                        m.setTitle(title);
-                        m.setSinger(singer);
-                        m.setAlbum(album);
-                        m.setSize(size);
-                        m.setTime(time);
-                        m.setUrl(url);
-                        m.setName(name);
-                        m.setAlbumId(cursor
-                                .getLong(cursor
-                                        .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
-                        m.setId(cursor
-                                .getLong(cursor
-                                        .getColumnIndex(MediaStore.Audio.Media._ID)));
-                        musicList.add(m);
-                    }
-                }while (cursor.moveToNext());
-            }
-        }else{
-            return null;
-        }
-        Collections.sort(musicList);
-        return musicList;
-    }
 }

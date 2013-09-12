@@ -20,6 +20,7 @@ public class MusicFileFilter implements FilenameFilter{
 
     public boolean accept(String fileName)
     {
+        if(fileName==null || fileName=="") return false;
         String fileExt = fileName.toLowerCase();
         for(String ext : this.extension){
             if(fileExt.endsWith(ext)) return true;

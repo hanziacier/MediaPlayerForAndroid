@@ -72,7 +72,6 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		setContentView(R.layout.music);
         app = (TTMdeiaPlayer)getApplication();//获得applicaiton的全局引用
         playbox = app.playbox;
-        lists = playbox.getPlayList();
 		textName = (TextView) this.findViewById(R.id.music_name);
 		textSinger = (TextView) this.findViewById(R.id.music_singer);
 		textStartTime = (TextView) this.findViewById(R.id.music_start_time);
@@ -202,7 +201,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-        lists = app.playbox.getPlayList();
+        lists = playbox.getPlayList();
 		receiver=new MyProgressBroadCastReceiver();
 		IntentFilter filter=new IntentFilter("cn.com.karl.progress");
 		this.registerReceiver(receiver, filter);		
@@ -219,9 +218,10 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		}
 		Log.e("doPlayById", "play id is "+id);
         int currentId = playbox.getCurrentPlayListId();//去除原盒子中正在播放的music 序号
+        Music currentMusic = playbox.getCurrentMusic();
         playbox.setPlayingMusic(id);
-
-		if (id == currentId) {
+        Music doPlayMusic = playbox.getCurrentMusic();//获得要播放的音乐
+		if (currentMusic!=null && doPlayMusic.getId() == currentMusic.getId()) {//现在要播放的跟播放盒子中播放的是同一音乐
 			textName.setText(playbox.getCurrentMusic().getTitle());
 			textSinger.setText(playbox.getCurrentMusic().getSinger());
 			textEndTime.setText(toTime((int) playbox.getCurrentMusic().getTime()));
@@ -248,11 +248,9 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			intent.putExtra("play", "play");
 			intent.putExtra("id", id);
 			intent.putExtra("total", (int) playbox.getCurrentMusic().getTime());
-
 			startService(intent);
             playbox.setPlaying(true);
 		}
-        playbox.currentMusicBitmap  = MusicUtil.getArtwork(this, playbox.getCurrentMusic().getId(), playbox.getCurrentMusic().getAlbumId(), false);
         if(playbox.currentMusicBitmap != null){
             Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + playbox.getCurrentMusic().getId());
             lrc_view.setBackgroundDrawable(new BitmapDrawable(playbox.currentMusicBitmap));

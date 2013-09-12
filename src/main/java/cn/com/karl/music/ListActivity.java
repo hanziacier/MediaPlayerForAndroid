@@ -47,7 +47,7 @@ public class ListActivity extends Activity {
 			        // 点击的是headerView或者footerView  
 			        return;  
 			    }
-                app.playbox.setPlayList(app.musicList);//设定临时播放列表
+                app.playbox.rsyncPlayList(app.musicList);//设定临时播放列表
 				Intent intent = new Intent(ListActivity.this,
 						MusicActivity.class);
 				intent.putExtra("id", position);

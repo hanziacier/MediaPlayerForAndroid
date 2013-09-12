@@ -1,10 +1,20 @@
 package cn.com.karl.domain;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
+import cn.com.karl.filter.MusicFileFilter;
+import cn.com.karl.music.MusicService;
 import cn.com.karl.music.TTMdeiaPlayer;
+import cn.com.karl.util.MusicUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,14 +66,93 @@ public class Playbox {
         return this.getMusic(this.currentPlayListId +1);
     }
 
-    public void setPlayingMusic(int currentPlayListId){//设置当前播放的音乐
+    public void setPlayingMusic(int currentPlayListId){//设置当前播放的音乐 设置bitmap
         this.currentPlayListId = currentPlayListId;
         this.currentMusic = this.playList.get(this.currentPlayListId);
+        this.currentMusicBitmap = MusicUtil.getArtwork(TTMdeiaPlayer.getInstance(),currentMusic.getId(), currentMusic.getAlbumId(), false);
     }
     public int setPlayList(List<Music> playList){
         this.playList = playList;
         this.playListCount = this.playList.size();
         return this.playListCount;
+    }
+    public int rsyncPlayList(List<Music> playList){
+        setPlayList(playList);
+        resetAudioPlayLists(this.playList);
+        return this.playListCount;
+    }
+    public void resetAudioPlayLists(List<Music> musicList){
+        ContentResolver cr = TTMdeiaPlayer.getInstance().getContentResolver();
+        cleanAudioPlayLists(cr, TTMdeiaPlayer.getInstance().tempPlayListId);
+        pushAudioPlayLists(cr,musicList,TTMdeiaPlayer.getInstance().tempPlayListId);
+    }
+    private int pushAudioPlayLists(ContentResolver resolver, List<Music> musicList, long playListId) {
+        int count = musicList.size();
+        int insertResult=0;
+        if(count > 0){
+            ContentValues[]  contentValuesList = new ContentValues[count];
+            int i=0;
+            for(Music music : musicList){
+                contentValuesList[i] = new ContentValues();
+                contentValuesList[i].put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, i);
+                contentValuesList[i].put(MediaStore.Audio.Playlists.Members.AUDIO_ID, music.getId());
+                i++;
+            }
+            Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playListId);
+            insertResult = resolver.bulkInsert( uri,contentValuesList );
+        }
+        return insertResult;
+    }
+    private int cleanAudioPlayLists(ContentResolver resolver,long playListId){
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playListId);
+        return resolver.delete(uri,null,null);
+
+    }
+    public List<Music> getAudioPlayLists(ContentResolver resolver,long playListId){
+        List<Music> musicList = new ArrayList<Music>();
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playListId);
+        Cursor cursor = resolver.query(uri,null,null,null, null);
+        if (null == cursor) {
+            return musicList;
+        }
+        if (cursor.moveToFirst()) {
+            do {
+                Music m = new Music();
+                String title = cursor.getString(cursor
+                        .getColumnIndex(MediaStore.Audio.Media.TITLE));
+                String singer = cursor.getString(cursor
+                        .getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                String album = cursor.getString(cursor
+                        .getColumnIndex(MediaStore.Audio.Media.ALBUM));
+                long size = cursor.getLong(cursor
+                        .getColumnIndex(MediaStore.Audio.Media.SIZE));
+                long time = cursor.getLong(cursor
+                        .getColumnIndex(MediaStore.Audio.Media.DURATION));
+                String url = cursor.getString(cursor
+                        .getColumnIndex(MediaStore.Audio.Media.DATA));
+                String name = cursor
+                        .getString(cursor
+                                .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+                Log.e("Playbox.getAudioPlayLists",title+"--"+singer);
+                if (new MusicFileFilter().accept(name) ) {
+                    m.setTitle(title);
+                    m.setSinger(singer);
+                    m.setAlbum(album);
+                    m.setSize(size);
+                    m.setTime(time);
+                    m.setUrl(url);
+                    m.setName(name);
+                    m.setAlbumId(cursor
+                            .getLong(cursor
+                                    .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
+                    m.setId(cursor
+                            .getLong(cursor
+                                    .getColumnIndex(MediaStore.Audio.Media._ID)));
+                    musicList.add(m);
+                }
+            }while (cursor.moveToNext());
+        }
+        return  musicList;
     }
     public List<Music> getPlayList(){
         return this.playList;

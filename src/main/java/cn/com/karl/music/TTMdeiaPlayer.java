@@ -34,7 +34,7 @@ public class TTMdeiaPlayer extends Application {
         boolean needCreateFavoritePlayList=true;
         if (cr != null) {
             Cursor cursor = cr.query(
-                    MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI, null, null,
+                    MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, null, null,
                     null, null);
             if (cursor.moveToFirst()) {
                 do {
@@ -57,20 +57,20 @@ public class TTMdeiaPlayer extends Application {
             if(needCreateTempPlayList){//创建临时播放列表
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Audio.PlaylistsColumns.NAME,MusicService.TEMP_PLAY_LIST_NAME);
-                Uri uri = cr.insert( MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI,contentValues );
+                Uri uri = cr.insert( MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,contentValues );
                 tempPlayListId = ContentUris.parseId(uri);
             }
             if(needCreateFavoritePlayList){//创建最爱播放列表
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Audio.PlaylistsColumns.NAME,MusicService.FAVORITE_PLAY_LIST_NAME);
-                Uri uri = cr.insert( MediaStore.Audio.Playlists.INTERNAL_CONTENT_URI,contentValues );
+                Uri uri = cr.insert( MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,contentValues );
                 favoritePlayListId = ContentUris.parseId(uri);
             }
         }
         MusicList.setExternalPath();
         musicList = MusicList.getMusicData(this);
         playbox = Playbox.getPlaybox();
-
+        playbox.setPlayList(playbox.getAudioPlayLists(getContentResolver(),tempPlayListId));
     }
 
 }

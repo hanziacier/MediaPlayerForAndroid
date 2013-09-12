@@ -56,7 +56,7 @@ public class ListAdapter extends BaseAdapter {
 		textMusicName.setText(m.getTitle());
 		//歌手
 		TextView textMusicSinger=(TextView) convertView.findViewById(R.id.music_item_singer);
-		textMusicSinger.setText(m.getSinger().compareTo(MusicList.defaultSinger) == 0 ? m.getAlbum() : m.getSinger());
+		textMusicSinger.setText(m.getSinger());
 	   //持续时间
 		TextView textMusicTime=(TextView) convertView.findViewById(R.id.music_item_time);
 		textMusicTime.setText(MusicUtil.toTime((int) m.getTime()));
