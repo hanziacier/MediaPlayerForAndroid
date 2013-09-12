@@ -296,7 +296,7 @@ public class MusicService extends Service implements Runnable {
                 break;
             }
 		}
-        stopSelf();
+        //stopSelf();
 	}
 
 	/**
