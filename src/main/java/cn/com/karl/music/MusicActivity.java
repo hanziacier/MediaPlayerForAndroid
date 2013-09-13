@@ -3,12 +3,10 @@ package cn.com.karl.music;
 import java.util.List;
 
 
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import cn.com.karl.domain.Music;
 import cn.com.karl.domain.Playbox;
 import cn.com.karl.util.LrcView;
-import cn.com.karl.util.MusicList;
 import android.annotation.SuppressLint;
 //import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -34,10 +32,9 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import cn.com.karl.util.MusicUtil;
 
 public class MusicActivity extends Activity implements SensorEventListener{
-    private TTMdeiaPlayer app;
+
 	private TextView textName;
 	private TextView textSinger;
 	private TextView textStartTime;
@@ -51,14 +48,14 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	private ImageButton imageBtnRandom;
 	public static LrcView lrc_view;
 	//private ImageView icon;
-	private SeekBar seekBar1;
+	private SeekBar seekBarProgress;
 	private SeekBar seekBarVolume;
 
 	private MyProgressBroadCastReceiver receiver;
 	private MyCompletionListner completionListner;
 	private SensorManager sensorManager;
 	private boolean mRegisteredSensor;
-
+    private TTMdeiaPlayer app;
     private List<Music> lists;
     private Playbox playbox;
 
@@ -77,7 +74,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		textStartTime = (TextView) this.findViewById(R.id.music_start_time);
 		textEndTime = (TextView) this.findViewById(R.id.music_end_time);
 		
-		seekBar1 = (SeekBar) this.findViewById(R.id.music_seekBar);//进度条
+		seekBarProgress = (SeekBar) this.findViewById(R.id.music_seekBar);//进度条
 		//icon = (ImageView) this.findViewById(R.id.image_icon);
 		imageBtnLast = (ImageButton) this.findViewById(R.id.music_lasted);
 		imageBtnRewind = (ImageButton) this.findViewById(R.id.music_rewind);
@@ -130,32 +127,32 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		telManager.listen(new MobliePhoneStateListener(),
 				PhoneStateListener.LISTEN_CALL_STATE);
 		//*/
-		seekBar1.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-			
-				seekBar1.setProgress(seekBar.getProgress());
-				Intent intent=new Intent("cn.com.karl.seekBar");
-				intent.putExtra("seekBarPosition", seekBar.getProgress());
-				sendBroadcast(intent);
-				
-			}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		seekBarProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+
+                seekBarProgress.setProgress(seekBar.getProgress());
+                Intent intent = new Intent("cn.com.karl.seekBar");
+                intent.putExtra("seekBarPosition", seekBar.getProgress());
+                sendBroadcast(intent);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,
+                                          boolean fromUser) {
+                // TODO Auto-generated method stub
+
+            }
+        });
 		
 		completionListner=new MyCompletionListner();
 		IntentFilter filter=new IntentFilter("cn.com.karl.completion");
@@ -169,8 +166,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		public void onCallStateChanged(int state, String incomingNumber) {//state电话状态 incomingNumber电话号码
 			switch (state) {
 			case TelephonyManager.CALL_STATE_IDLE: //* 无任何状态时 
-				intent = new Intent(MusicActivity.this,
-						MusicService.class);
+				intent = new Intent(MusicActivity.this,MusicService.class);
 				intent.putExtra("play", "playing");
 				intent.putExtra("id", playbox.getCurrentPlayListId());
 				startService(intent);
@@ -180,8 +176,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			case TelephonyManager.CALL_STATE_OFFHOOK: //* 接起电话时 
 				
 			case TelephonyManager.CALL_STATE_RINGING: //* 电话进来时 
-				intent = new Intent(MusicActivity.this,
-						MusicService.class);
+				intent = new Intent(MusicActivity.this,MusicService.class);
 				intent.putExtra("play", "pause");
 				startService(intent);
 				playbox.setPlaying(false);
@@ -252,7 +247,6 @@ public class MusicActivity extends Activity implements SensorEventListener{
             playbox.setPlaying(true);
 		}
         if(playbox.currentMusicBitmap != null){
-            Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + playbox.getCurrentMusic().getId());
             lrc_view.setBackgroundDrawable(new BitmapDrawable(playbox.currentMusicBitmap));
         }else{
             lrc_view.setBackgroundResource(R.drawable.listbg);
@@ -288,13 +282,10 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	}
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		
 		this.unregisterReceiver(completionListner);
 		super.onDestroy();
 	}
     public class MyProgressBroadCastReceiver extends BroadcastReceiver{
-
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
@@ -303,8 +294,8 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			int progress = position * 100 / total;
             textEndTime.setText(toTime(total));
 			textStartTime.setText(toTime(position));
-			seekBar1.setProgress(progress);
-			seekBar1.invalidate();
+			seekBarProgress.setProgress(progress);
+			seekBarProgress.invalidate();
 		}
     	
     }
