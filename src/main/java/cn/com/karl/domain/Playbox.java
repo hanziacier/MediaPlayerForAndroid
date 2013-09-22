@@ -71,6 +71,9 @@ public class Playbox {
         this.currentMusic = this.playList.get(this.currentPlayListId);
         this.currentMusicBitmap = MusicUtil.getArtwork(TTMdeiaPlayer.getInstance(),currentMusic.getId(), currentMusic.getAlbumId(), false);
     }
+    /*
+    * 设置前端的播放列表
+    * */
     public int setPlayList(List<Music> playList){
         this.playList = playList;
         this.playListCount = this.playList.size();
@@ -108,6 +111,9 @@ public class Playbox {
         return resolver.delete(uri,null,null);
 
     }
+    /*
+    * 获得指定播放列表下的音乐列表
+    * */
     public List<Music> getAudioPlayLists(ContentResolver resolver,long playListId){
         List<Music> musicList = new ArrayList<Music>();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playListId);

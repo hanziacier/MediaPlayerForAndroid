@@ -19,8 +19,8 @@ import java.util.List;
 public class TTMdeiaPlayer extends Application {
     public List<Music> musicList=null;//当前界面下的音乐列表
     public Playbox playbox=null;
-    public long tempPlayListId = -1;
-    public long favoritePlayListId = -1;
+    public long tempPlayListId = -1;//临时播放列表的id
+    public long favoritePlayListId = -1;//我的最爱播放列表的id
     private static TTMdeiaPlayer instance;
 
     public static TTMdeiaPlayer getInstance() {

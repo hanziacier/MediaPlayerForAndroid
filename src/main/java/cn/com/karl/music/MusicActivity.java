@@ -3,12 +3,11 @@ package cn.com.karl.music;
 import java.util.List;
 
 
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import cn.com.karl.domain.Music;
 import cn.com.karl.domain.Playbox;
 import cn.com.karl.util.LrcView;
-import cn.com.karl.util.MusicList;
+
 import android.annotation.SuppressLint;
 //import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -34,7 +33,6 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import cn.com.karl.util.MusicUtil;
 
 public class MusicActivity extends Activity implements SensorEventListener{
     private TTMdeiaPlayer app;
@@ -51,7 +49,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 	private ImageButton imageBtnRandom;
 	public static LrcView lrc_view;
 	//private ImageView icon;
-	private SeekBar seekBar1;
+	private SeekBar seekBarProgress;
 	private SeekBar seekBarVolume;
 
 	private MyProgressBroadCastReceiver receiver;
@@ -77,7 +75,7 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		textStartTime = (TextView) this.findViewById(R.id.music_start_time);
 		textEndTime = (TextView) this.findViewById(R.id.music_end_time);
 		
-		seekBar1 = (SeekBar) this.findViewById(R.id.music_seekBar);//进度条
+		seekBarProgress = (SeekBar) this.findViewById(R.id.music_seekBar);//进度条
 		//icon = (ImageView) this.findViewById(R.id.image_icon);
 		imageBtnLast = (ImageButton) this.findViewById(R.id.music_lasted);
 		imageBtnRewind = (ImageButton) this.findViewById(R.id.music_rewind);
@@ -130,32 +128,32 @@ public class MusicActivity extends Activity implements SensorEventListener{
 		telManager.listen(new MobliePhoneStateListener(),
 				PhoneStateListener.LISTEN_CALL_STATE);
 		//*/
-		seekBar1.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-			
-				seekBar1.setProgress(seekBar.getProgress());
-				Intent intent=new Intent("cn.com.karl.seekBar");
-				intent.putExtra("seekBarPosition", seekBar.getProgress());
-				sendBroadcast(intent);
-				
-			}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		seekBarProgress.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+
+                seekBarProgress.setProgress(seekBar.getProgress());
+                Intent intent = new Intent("cn.com.karl.seekBar");
+                intent.putExtra("seekBarPosition", seekBar.getProgress());
+                sendBroadcast(intent);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,
+                                          boolean fromUser) {
+                // TODO Auto-generated method stub
+
+            }
+        });
 		
 		completionListner=new MyCompletionListner();
 		IntentFilter filter=new IntentFilter("cn.com.karl.completion");
@@ -217,9 +215,9 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			id = 0;
 		}
 		Log.e("doPlayById", "play id is "+id);
-        int currentId = playbox.getCurrentPlayListId();//去除原盒子中正在播放的music 序号
+        int currentId = playbox.getCurrentPlayListId();//取出原盒子中正在播放的music 序号
         Music currentMusic = playbox.getCurrentMusic();
-        playbox.setPlayingMusic(id);
+        playbox.setPlayingMusic(id);//设置当前播放的音乐 id music bitmap
         Music doPlayMusic = playbox.getCurrentMusic();//获得要播放的音乐
 		if (currentMusic!=null && doPlayMusic.getId() == currentMusic.getId()) {//现在要播放的跟播放盒子中播放的是同一音乐
 			textName.setText(playbox.getCurrentMusic().getTitle());
@@ -231,26 +229,19 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			intent.putExtra("total", (int) playbox.getCurrentMusic().getTime());
 			Log.e("doPlayById", id+"=="+currentId+",now startService doing");
 			startService(intent);
-			if (playbox.isPlaying()) {
-				imageBtnPlay.setImageResource(R.drawable.pause1);
-			} else {
-				imageBtnPlay.setImageResource(R.drawable.play1);
-                playbox.setPlaying(true);
-			}
-			
 			
 		}else {
 			textName.setText(playbox.getCurrentMusic().getTitle());
 			textSinger.setText(playbox.getCurrentMusic().getSinger());
 			textEndTime.setText(toTime((int) playbox.getCurrentMusic().getTime()));
-			imageBtnPlay.setImageResource(R.drawable.pause1);
 			Intent intent = new Intent(MusicActivity.this, MusicService.class);
 			intent.putExtra("play", "play");
 			intent.putExtra("id", id);
 			intent.putExtra("total", (int) playbox.getCurrentMusic().getTime());
 			startService(intent);
-            playbox.setPlaying(true);
 		}
+        imageBtnPlay.setImageResource(R.drawable.pause1);
+        playbox.setPlaying(true);
         if(playbox.currentMusicBitmap != null){
             Log.e("MusicActivity", "I Have Get The Bitmap ,The SongId Is " + playbox.getCurrentMusic().getId());
             lrc_view.setBackgroundDrawable(new BitmapDrawable(playbox.currentMusicBitmap));
@@ -303,8 +294,8 @@ public class MusicActivity extends Activity implements SensorEventListener{
 			int progress = position * 100 / total;
             textEndTime.setText(toTime(total));
 			textStartTime.setText(toTime(position));
-			seekBar1.setProgress(progress);
-			seekBar1.invalidate();
+			seekBarProgress.setProgress(progress);
+			seekBarProgress.invalidate();
 		}
     	
     }
