@@ -93,12 +93,13 @@ public class MainActivity extends TabActivity {
             if (v == progressSeekBar.mPlayImageButton) {
                 //Log.e("MainActivity","MusicService.playStatus "+MusicService.playing.toString()+" MusicService._id "+MusicService._id);
                 // ÕýÔÚ²¥·Å
-                if (app.playbox.isPlaying() == true) {
+                if (app.playbox.isPlaying()) {
                     Intent intent = new Intent(MainActivity.this,
                             MusicService.class);
                     intent.putExtra("play", "pause");
                     intent.putExtra("id", app.playbox.getCurrentPlayListId());
                     startService(intent);
+                    app.playbox.setPlaying(false);
                     progressSeekBar.mPlayImageButton.setImageResource(R.drawable.play1);
 
                 } else {
@@ -107,6 +108,7 @@ public class MainActivity extends TabActivity {
                     intent.putExtra("play", "playing");
                     intent.putExtra("id", app.playbox.getCurrentPlayListId());
                     startService(intent);
+                    app.playbox.setPlaying(true);
                     progressSeekBar.mPlayImageButton.setImageResource(R.drawable.pause1);
 
                 }
@@ -140,7 +142,7 @@ public class MainActivity extends TabActivity {
             int progress = position * 100 / total;
             progressSeekBar.mTitleTextView.setText(music.getTitle());
             progressSeekBar.mArtists.setText(MusicUtil.toTime((int)music.getTime()));
-            if(MusicService.playing) {
+            if(app.playbox.isPlaying()) {
                 progressSeekBar.mPlayImageButton.setImageResource(R.drawable.pause1);
             }else {
                 progressSeekBar.mPlayImageButton.setImageResource(R.drawable.play1);

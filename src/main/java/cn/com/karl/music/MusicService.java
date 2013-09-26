@@ -40,7 +40,6 @@ public class MusicService extends Service implements Runnable {
     public final static String TEMP_PLAY_LIST_NAME = "TTMediaPlayLists_Temp";//临时播放列表
     public final static String FAVORITE_PLAY_LIST_NAME = "TTMediaPlayLists_Favorite";//最喜爱的播放列表
     private int TTMediaPlayLists_Temp_Id;//临时播放列表的ID
-    private int TTMediaPlayLists_Favorite_Id;//最喜爱的播放列表的ID
     private  int sleepTime=0;
     private int maxSleepTime=60*1000; //最大静置时间，十分钟 之后退出service
 
